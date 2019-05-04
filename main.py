@@ -18,7 +18,7 @@ try:
 except:
     print('Support CPU only')
 
-NUM_EPOCH = 2
+NUM_EPOCH = 20
 USE_CUDA = True
 PRINT_EVERY = 10
 DEVICE = torch.device("cuda") if (torch.cuda.is_available()
@@ -66,9 +66,9 @@ for epoch in range(NUM_EPOCH):
 
         running_loss += loss.item()
         if i % PRINT_EVERY == 0:
-            loss_ave = running_loss / PRINT_EVERY
+            loss_ave = running_loss / len(labels)
             print('[%d, %d] loss: %.3f' %
-                  (epoch + 1, i + 1, running_loss / PRINT_EVERY))
+                  (epoch, i, loss_ave))
             writer.add_scalar('train_loss', loss_ave, step)
             running_loss = 0.0
         step += 1
