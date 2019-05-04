@@ -80,7 +80,7 @@ for epoch in range(NUM_EPOCH):
             print('[%d, %d] loss: %.3f' % (epoch, i, loss_ave))
             writer.add_scalar('train_loss', loss_ave, step)
             running_loss = 0.0
-            acc = calc_accuracy(outputs, labels)
+            acc = calc_accuracy(outputs, labels.to(DEVICE))
             writer.add_scalar('train_acc', acc, step)
 
             with torch.no_grad():
