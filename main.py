@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 from tensorboardX import SummaryWriter
 import pdb
 import argparse
+import os
 
 from cnn_model import CNN
 
@@ -16,12 +17,13 @@ try:
     os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 except:
     print('Support CPU only')
-    
+
 NUM_EPOCH = 2
 USE_CUDA = True
 PRINT_EVERY = 10
 DEVICE = torch.device("cuda") if (torch.cuda.is_available()
                                   and USE_CUDA) else torch.device("cpu")
+print(DEVICE)
 
 writer = SummaryWriter('result/logs/')
 
