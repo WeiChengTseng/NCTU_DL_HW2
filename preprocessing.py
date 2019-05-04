@@ -43,21 +43,18 @@ class RandomCrop(object):
             assert len(output_size) == 2
             self._output_size = output_size
 
-    def __call__(self, sample):
+    def __call__(self, img, label):
         image, landmarks = sample['image'], sample['landmarks']
-
-        h, w = image.shape[:2]
+        h, w = img.shape[:2]
         new_h, new_w = self._output_size
 
         top = np.random.randint(0, h - new_h)
         left = np.random.randint(0, w - new_w)
 
-        image = image[top: top + new_h,
+        image = img[top: top + new_h,
                       left: left + new_w]
 
-        landmarks = landmarks - [left, top]
-
-        return {'image': image, 'landmarks': landmarks}
+        return image, label
 
 
 class ToTensor(object):
