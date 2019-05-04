@@ -66,7 +66,7 @@ for epoch in range(NUM_EPOCH):
 
         running_loss += loss.item()
         if i % PRINT_EVERY == 0:
-            loss_ave = running_loss / len(labels)
+            loss_ave = running_loss / PRINT_EVERY
             print('[%d, %d] loss: %.3f' %
                   (epoch, i, loss_ave))
             writer.add_scalar('train_loss', loss_ave, step)
