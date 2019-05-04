@@ -22,7 +22,6 @@ except:
 def calc_accuracy(pred_scores, Y):
     with torch.no_grad():
         _, pred = torch.max(pred_scores, 1)
-        pdb.set_trace()
         train_acc = (pred == Y).float().mean()
         return train_acc
 
