@@ -18,7 +18,7 @@ class CNN(nn.Module):
         self.fc1 = nn.Linear(16 * 53 * 53, 120)
         self.fc2 = nn.Linear(120, 84)
         self.fc3 = nn.Linear(84, 10)
-        self.softmax = nn.Softmax()
+        return
 
     def forward(self, x):
         bs = x.shape[0]
@@ -28,5 +28,4 @@ class CNN(nn.Module):
         x = F.relu(self.fc1(x))
         x = F.relu(self.fc2(x))
         x = self.fc3(x)
-        x = self.softmax(x)
         return x

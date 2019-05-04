@@ -18,6 +18,14 @@ try:
 except:
     print('Support CPU only')
 
+def calc_accuracy(pred_scores,Y):
+    with torch.no_grad():
+        _, pred = torch.max(pred_scores, 1)
+        train_acc = (pred == Y).sum().data.numpy()/pred.size()[0]
+        return train_acc
+
+
+
 NUM_EPOCH = 20
 BATCH_SIZE = 50
 USE_CUDA = True
@@ -71,18 +79,23 @@ for epoch in range(NUM_EPOCH):
             print('[%d, %d] loss: %.3f' % (epoch, i, loss_ave))
             writer.add_scalar('train_loss', loss_ave, step)
             running_loss = 0.0
-
-            _, pred = torch.max(outputs, 1)
+            acc = calc_accuracy(outputs, labels)
+            writer.add_scalar('train_acc', acc, step)
+            
             with torch.no_grad():
-                test_loss = 0.0
+                test_loss, acc_test = 0.0, []
                 optimizer.zero_grad()
+
                 n_epoch_test = len(val_ds) // BATCH_SIZE
                 for j, data_t in enumerate(val_dl):
                     inputs_t, labels_t = data_t
                     outputs_t = model(inputs_t.to(DEVICE))
                     loss_t = criterion(outputs_t, labels_t.to(DEVICE))
+
                     test_loss += loss_t
+                    acc_test.append(calc_accuracy(outputs_t, labels_t))
                 writer.add_scalar('test_loss', test_loss, step)
+                writer.add_scalar('test_acc', np.mean(acc_test), step)
         step += 1
 
 print('Finished Training')
