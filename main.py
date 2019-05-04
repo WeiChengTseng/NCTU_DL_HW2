@@ -18,13 +18,13 @@ try:
 except:
     print('Support CPU only')
 
+
 def calc_accuracy(pred_scores, Y):
     with torch.no_grad():
         _, pred = torch.max(pred_scores, 1)
         pdb.set_trace()
         train_acc = (pred == Y).float().mean()
         return train_acc
-
 
 
 NUM_EPOCH = 20
@@ -82,7 +82,7 @@ for epoch in range(NUM_EPOCH):
             running_loss = 0.0
             acc = calc_accuracy(outputs, labels)
             writer.add_scalar('train_acc', acc, step)
-            
+
             with torch.no_grad():
                 test_loss, acc_test = 0.0, []
                 optimizer.zero_grad()
@@ -94,7 +94,8 @@ for epoch in range(NUM_EPOCH):
                     loss_t = criterion(outputs_t, labels_t.to(DEVICE))
 
                     test_loss += loss_t
-                    acc_test.append(calc_accuracy(outputs_t, labels_t))
+                    acc_test.append(
+                        calc_accuracy(outputs_t, labels_t.to(DEVICE)))
                 writer.add_scalar('test_loss', test_loss, step)
                 writer.add_scalar('test_acc', np.mean(acc_test), step)
         step += 1
