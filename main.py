@@ -6,7 +6,7 @@ import torchvision
 
 import numpy as np
 import matplotlib.pyplot as plt
-import tensorboardX
+from tensorboardX import SummaryWriter
 import pdb
 
 from cnn_model import CNN
@@ -16,6 +16,8 @@ USE_CUDA = False
 PRINT_EVERY = 10
 DEVICE = torch.device("cuda") if (torch.cuda.is_available()
                                   and USE_CUDA) else torch.device("cpu")
+
+writer = SummaryWriter('result/logs/')
 
 data_transform = torchvision.transforms.Compose([
     torchvision.transforms.RandomSizedCrop(224),
@@ -41,6 +43,7 @@ val_dl = torch.utils.data.DataLoader(val_ds,
 model = CNN().to(DEVICE)
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=0.001)
+step = 0
 
 for epoch in range(NUM_EPOCH):
     running_loss = 0.0
@@ -48,15 +51,18 @@ for epoch in range(NUM_EPOCH):
         inputs, labels = data
         optimizer.zero_grad()
 
-        outputs = model(inputs)
-        loss = criterion(outputs, labels)
+        outputs = model(inputs.to(DEVICE))
+        loss = criterion(outputs, labels.to(DEVICE))
         loss.backward()
         optimizer.step()
 
         running_loss += loss.item()
         if i % PRINT_EVERY == 0:
+            loss_ave = running_loss / PRINT_EVERY
             print('[%d, %d] loss: %.3f' %
                   (epoch + 1, i + 1, running_loss / PRINT_EVERY))
+            writer.add_scalar('train_loss', loss_ave, step)
             running_loss = 0.0
+        step += 1
 
 print('Finished Training')
