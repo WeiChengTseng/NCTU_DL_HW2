@@ -19,6 +19,7 @@ except:
     print('Support CPU only')
 
 NUM_EPOCH = 20
+BATCH_SIZE = 50
 USE_CUDA = True
 PRINT_EVERY = 10
 DEVICE = torch.device("cuda") if (torch.cuda.is_available()
@@ -40,11 +41,11 @@ val_ds = torchvision.datasets.ImageFolder(root='./animal-10/val/',
                                           transform=data_transform)
 
 train_dl = torch.utils.data.DataLoader(train_ds,
-                                       batch_size=50,
+                                       batch_size=BATCH_SIZE,
                                        shuffle=True,
                                        num_workers=4)
 val_dl = torch.utils.data.DataLoader(val_ds,
-                                     batch_size=50,
+                                     batch_size=BATCH_SIZE,
                                      shuffle=True,
                                      num_workers=4)
 
@@ -67,10 +68,20 @@ for epoch in range(NUM_EPOCH):
         running_loss += loss.item()
         if i % PRINT_EVERY == 0:
             loss_ave = running_loss / PRINT_EVERY
-            print('[%d, %d] loss: %.3f' %
-                  (epoch, i, loss_ave))
+            print('[%d, %d] loss: %.3f' % (epoch, i, loss_ave))
             writer.add_scalar('train_loss', loss_ave, step)
             running_loss = 0.0
+
+            with torch.no_grad():
+                test_loss = 0.0
+                optimizer.zero_grad()
+                n_epoch_test = len(val_ds) // BATCH_SIZE
+                for j, data_t in enumerate(val_dl):
+                    inputs_t, labels_t = data_t
+                    outputs_t = model(inputs_t.to(DEVICE))
+                    loss_t = criterion(outputs_t, labels_t.to(DEVICE))
+                    test_loss += loss_t
+                writer.add_scalar('test_loss', test_loss, step)
         step += 1
 
 print('Finished Training')
