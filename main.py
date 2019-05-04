@@ -18,10 +18,10 @@ try:
 except:
     print('Support CPU only')
 
-def calc_accuracy(pred_scores,Y):
+def calc_accuracy(pred_scores, Y):
     with torch.no_grad():
         _, pred = torch.max(pred_scores, 1)
-        train_acc = (pred == Y).sum().data.numpy()/pred.size()[0]
+        train_acc = (pred == Y).float().mean()
         return train_acc
 
 
