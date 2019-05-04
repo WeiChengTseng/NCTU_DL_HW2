@@ -72,6 +72,7 @@ for epoch in range(NUM_EPOCH):
             writer.add_scalar('train_loss', loss_ave, step)
             running_loss = 0.0
 
+            _, pred = torch.max(outputs, 1)
             with torch.no_grad():
                 test_loss = 0.0
                 optimizer.zero_grad()
