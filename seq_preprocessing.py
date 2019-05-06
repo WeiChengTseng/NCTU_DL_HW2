@@ -73,17 +73,13 @@ class SeqDataLoader():
                            dtype=int)
 
             seq_len, seq = seq_len[seq_sort], seq[seq_sort]
-
             idx += bs
 
             if self._cuda:
                 src_tensor = torch.Tensor(seq)
                 src_len_tensor = torch.Tensor(seq_len)
 
-                src_tensor = src_tensor.cuda()
-                src_len_tensor = src_len_tensor.cuda()
-
-                yield src_tensor, src_len_tensor
+                yield src_tensor.cuda(), src_len_tensor.cuda()
             else:
                 yield torch.Tensor(seq), torch.Tensor(seq_len)
 
