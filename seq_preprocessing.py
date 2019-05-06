@@ -14,32 +14,11 @@ import os
 import pandas as pd
 import random
 
-accecpted = pd.read_excel('iclr/ICLR_accepted.xlsx', index_col=0).values
-rejected = pd.read_excel('iclr/ICLR_rejected.xlsx', index_col=0).values
-
-
-class SeqDataset(Dataset):
-    def __init__(self, filename):
-        super(SeqDataset, self).__init__()
-        seq_list = pd.read_excel(filename, index_col=0).values
-        to_lower = lambda x: '<bos> ' + x[0].lower() + ' <eos>'
-        self._seq = list(map(to_lower, seq_list))
-        self._token = np.unique(' '.join(self._seq).split()) + ['<pad>']
-        self._token_map = {word: idx for idx, word in enumerate(self._token)}
-        return
-
-    def __len__(self):
-
-        return
-
-    def __getitem__(self, idx):
-        token_str = list(map(lambda x: self._token_map[x], self._seq[idx]))
-        return token_str, len(token_str)
-
 
 class SeqDataLoader():
-    def __init__(self, filename, gpu=None):
-        seq_list = pd.read_excel(filename, index_col=0).values
+    def __init__(self, dataframe, gpu=None):
+        # seq_list = pd.read_excel(filename, index_col=0).values
+        seq_list = dataframe.values
         to_lower = lambda x: '<bos> ' + x[0].lower() + ' <eos>'
         self._seq = list(map(to_lower, seq_list))
         self._token = np.unique(' '.join(self._seq).split()) + ['<pad>']
@@ -91,4 +70,4 @@ class SeqDataLoader():
 
 
 if __name__ == '__main__':
-    dataset = SeqDataset('iclr/ICLR_accepted.xlsx')
+    dataset = SeqDataLoader('iclr/ICLR_accepted.xlsx')
