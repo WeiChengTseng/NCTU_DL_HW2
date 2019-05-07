@@ -27,6 +27,8 @@ NUM_EPOCH = 20
 BATCH_SIZE = 50
 USE_CUDA = True
 PRINT_EVERY = 10
+EMBEDDING_DIM = 10
+HIDDEN_DIM = 10
 DEVICE = torch.device("cuda") if (torch.cuda.is_available()
                                   and USE_CUDA) else torch.device("cpu")
 LOG_PATH = 'result/logs/lstm'
@@ -43,7 +45,7 @@ test_df = accepted[:50].append(rejected[:50])
 train_dl = SeqDataLoader(train_df, DEVICE)
 test_dl = SeqDataLoader(test_df, DEVICE)
 
-lstm_model = LSTM(dataset.n_token, EMBEDDING_DIM, HIDDEN_DIM, dataset.n_token)
+lstm_model = LSTM(dataset.n_token, EMBEDDING_DIM, HIDDEN_DIM, 2)
 
 writer = SummaryWriter(LOG_PATH)
 loss_fn = nn.NLLLoss()
