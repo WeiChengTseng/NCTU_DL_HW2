@@ -21,7 +21,7 @@ class SeqDataLoader():
         seq_list = dataframe.values
         to_lower = lambda x: '<bos> ' + x[0].lower() + ' <eos>'
         self._seq = list(map(to_lower, seq_list))
-        self._token = np.unique(' '.join(self._seq).split()) + ['<pad>']
+        self._token = list(np.unique(' '.join(self._seq).split())) + ['<pad>']
         self._token_map = {word: idx for idx, word in enumerate(self._token)}
         self._idx_map = {idx: word for idx, word in enumerate(self._token)}
         to_idx = lambda x: [self._token_map[token] for token in x]
