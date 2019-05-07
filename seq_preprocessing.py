@@ -16,21 +16,20 @@ import random
 
 
 class SeqDataLoader():
-    def __init__(self, dataframe, gpu=None):
+    def __init__(self, dataframe, device=None):
         # seq_list = pd.read_excel(filename, index_col=0).values
         seq_list = dataframe.values
         to_lower = lambda x: '<bos> ' + x[0].lower() + ' <eos>'
         self._seq = list(map(to_lower, seq_list))
         self._token = list(np.unique(' '.join(self._seq).split())) + ['<pad>']
+        # print(self._token)
+        # pdb.set_trace()
         self._token_map = {word: idx for idx, word in enumerate(self._token)}
         self._idx_map = {idx: word for idx, word in enumerate(self._token)}
-        to_idx = lambda x: [self._token_map[token] for token in x]
+        to_idx = lambda x: [self._token_map[token] for token in x.split()]
         self._idx_seq = list(map(to_idx, self._seq))
+        self._device = device
 
-        if gpu:
-            self._cuda = True
-        else:
-            self._cuda = False
         return
 
     def __len__(self):
@@ -54,13 +53,8 @@ class SeqDataLoader():
             seq_len, seq = seq_len[seq_sort], seq[seq_sort]
             idx += bs
 
-            if self._cuda:
-                src_tensor = torch.Tensor(seq)
-                src_len_tensor = torch.Tensor(seq_len)
-
-                yield src_tensor.cuda(), src_len_tensor.cuda()
-            else:
-                yield torch.Tensor(seq), torch.Tensor(seq_len)
+            yield torch.Tensor(seq).to(self._device), torch.Tensor(seq_len).to(
+                self._device)
 
     def _shuffle(self):
         seqs = list(zip(self._seq, self._idx_seq))
