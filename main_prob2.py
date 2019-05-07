@@ -48,30 +48,20 @@ test_dl = SeqDataLoader(test_df, DEVICE)
 lstm_model = LSTM(dataset.n_token, EMBEDDING_DIM, HIDDEN_DIM, 2)
 
 writer = SummaryWriter(LOG_PATH)
-loss_fn = nn.NLLLoss()
-optimizer = torch.optim.Adam(model.parameters())
+loss_fn = nn.CrossEntropyLoss()
+optimizer = torch.optim.Adam(lstm_model.parameters())
 
 step = 0
 for epoch in range(NUM_EPOCH):
 
     lstm_model.train()
     train_iter = train_dl.batch_iter(bs=BATCH_SIZE, len_limit=80)
-    for data in train_iter:
+    for seq, seq_len, labels in train_iter:
         lstm_model.zero_grad()
 
-        sentence_in = data[args.domain]
-        pad_tensor = torch.ones(BATCH_SIZE, 1)
-        pad_tensor.new_full((BATCH_SIZE, 1), dataset.get_id('<pad>'))
+        pred_scores = lstm_model(seq, seq_len)
 
-        if args.gpu:
-            pad_tensor = pad_tensor.cuda()
-        targets = torch.cat([data[args.domain][:, 1:], pad_tensor], dim=1)
-
-        pred_scores, _ = lstm_model(sentence_in.type(torch.LongTensor),
-                               data[args.domain + '_len'])
-
-        loss = loss_fn(pred_scores.permute(0, 2, 1),
-                             targets.type(torch.LongTensor))
+        loss = loss_fn(pred_scores, labels)
         loss.backward()
         optimizer.step()
 
