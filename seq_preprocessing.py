@@ -42,11 +42,10 @@ class SeqDataLoader():
             seq_len = np.array(
                 [len(s) for s in self._idx_seq[idx:idx + bs]], dtype=int)
             seq_sort = np.argsort(seq_len)[::-1]
-            seq_label = self._seq_label[idx: idx + bs]
+            seq_label = np.array(self._seq_label[idx: idx + bs])
             max_len = max(seq_len)
-
             seq = np.array([
-                s + [self._token_map['<pad>']] * (max_len - len(s[0]))
+                s + [self._token_map['<pad>']] * (max_len - len(s))
                 for s in self._idx_seq[idx:idx + bs]
             ],
                            dtype=int)
@@ -54,8 +53,8 @@ class SeqDataLoader():
             seq_len, seq, seq_label = seq_len[seq_sort], seq[seq_sort], seq_label[seq_sort]
             idx += bs
 
-            yield torch.Tensor(seq).to(self._device), torch.Tensor(seq_len).to(
-                self._device), torch.tensor(seq_label).to(self._device)
+            yield torch.LongTensor(seq).to(self._device), torch.LongTensor(seq_len).to(
+                self._device), torch.LongTensor(seq_label).to(self._device)
 
     def _shuffle(self):
         seqs = list(zip(self._seq, self._idx_seq, self._seq_label))
