@@ -40,13 +40,13 @@ class SeqDataLoader():
         self._shuffle()
         while (idx + bs < len(self)):
             seq_len = np.array(
-                [len(s[0]) for s in self._idx_seq[idx:idx + bs]], dtype=int)
+                [len(s) for s in self._idx_seq[idx:idx + bs]], dtype=int)
             seq_sort = np.argsort(seq_len)[::-1]
             seq_label = self._seq_label[idx: idx + bs]
             max_len = max(seq_len)
 
             seq = np.array([
-                s[0] + [self._token_map['<pad>']] * (max_len - len(s[0]))
+                s + [self._token_map['<pad>']] * (max_len - len(s[0]))
                 for s in self._idx_seq[idx:idx + bs]
             ],
                            dtype=int)
