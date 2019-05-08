@@ -19,7 +19,7 @@ class SeqDataLoader():
     def __init__(self, dataframe, device=None):
         df_value = dataframe.values
         seq_list, self._seq_label = df_value[:, 0], df_value[:, 1]
-        to_lower = lambda x: '<bos> ' + x[0].lower() + ' <eos>'
+        to_lower = lambda x: '<bos> ' + x.lower() + ' <eos>'
         self._seq = list(map(to_lower, seq_list))
         self._token = list(np.unique(' '.join(self._seq).split())) + ['<pad>']
 
