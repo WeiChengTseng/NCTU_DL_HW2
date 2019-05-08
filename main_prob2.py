@@ -45,7 +45,7 @@ test_df = accepted[:50].append(rejected[:50])
 train_dl = SeqDataLoader(train_df, DEVICE)
 test_dl = SeqDataLoader(test_df, DEVICE)
 
-lstm_model = LSTM(dataset.n_token, EMBEDDING_DIM, HIDDEN_DIM, 2)
+lstm_model = LSTM(train_dl.n_token, EMBEDDING_DIM, HIDDEN_DIM, 2)
 
 writer = SummaryWriter(LOG_PATH)
 loss_fn = nn.CrossEntropyLoss()
