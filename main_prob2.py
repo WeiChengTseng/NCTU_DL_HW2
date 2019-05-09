@@ -14,7 +14,7 @@ import os
 import logging
 
 from rnn_model import LSTM
-from seq_preprocessing import SeqDataLoader
+from seq_preprocessing import SeqDataLoader, token_generation
 
 try:
     os.environ["CUDA_VISIBLE_DEVICES"] = "0"
@@ -23,7 +23,7 @@ except:
 
 ACCEPT = 'iclr/ICLR_accepted.xlsx'
 REJECT = 'iclr/ICLR_rejected.xlsx'
-NUM_EPOCH = 20
+NUM_EPOCH = 200
 BATCH_SIZE = 50
 USE_CUDA = True
 PRINT_EVERY = 10
@@ -42,10 +42,12 @@ rejected.insert(1, "label", [0] * len(rejected))
 train_df = accepted[50:].append(rejected[50:])
 test_df = accepted[:50].append(rejected[:50])
 
-train_dl = SeqDataLoader(train_df, DEVICE)
-test_dl = SeqDataLoader(test_df, DEVICE)
+token_info = token_generation(accepted.append(rejected))
 
-lstm_model = LSTM(train_dl.n_token, EMBEDDING_DIM, HIDDEN_DIM, 2)
+train_dl = SeqDataLoader(train_df, token_info, DEVICE)
+test_dl = SeqDataLoader(test_df, token_info, DEVICE)
+
+lstm_model = LSTM(train_dl.n_token, EMBEDDING_DIM, HIDDEN_DIM, 2).to(DEVICE)
 
 writer = SummaryWriter(LOG_PATH)
 loss_fn = nn.CrossEntropyLoss()

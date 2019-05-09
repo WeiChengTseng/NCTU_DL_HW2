@@ -13,18 +13,22 @@ import argparse
 import os
 import pandas as pd
 import random
+import pickle
 
 
 class SeqDataLoader():
-    def __init__(self, dataframe, device=None):
+    def __init__(self, dataframe, token_info, device=None):
         df_value = dataframe.values
         seq_list, self._seq_label = df_value[:, 0], df_value[:, 1]
         to_lower = lambda x: '<bos> ' + x.lower() + ' <eos>'
         self._seq = list(map(to_lower, seq_list))
         self._token = list(np.unique(' '.join(self._seq).split())) + ['<pad>']
 
-        self._token_map = {word: idx for idx, word in enumerate(self._token)}
-        self._idx_map = {idx: word for idx, word in enumerate(self._token)}
+        # self._token_map = {word: idx for idx, word in enumerate(self._token)}
+        # self._idx_map = {idx: word for idx, word in enumerate(self._token)}
+
+        self._token_map = token_info['token_map']
+        self._idx_map = token_info['idx_map']
         to_idx = lambda x: [self._token_map[token] for token in x.split()]
         self._idx_seq = list(map(to_idx, self._seq))
         self._device = device
@@ -62,6 +66,20 @@ class SeqDataLoader():
         self._seq, self._idx_seq, self._seq_label = zip(*seqs)
         return
 
+def token_generation(dataframe, preload=False):
+    if preload:
+        return pickle.load(open('token_info.pkl', 'rb'))
+    df_value = dataframe.values
+    seq_list, seq_label = df_value[:, 0], df_value[:, 1]
+    to_lower = lambda x: '<bos> ' + x.lower() + ' <eos>'
+    seq = list(map(to_lower, seq_list))
+    token = list(np.unique(' '.join(seq).split())) + ['<pad>']
+
+    token_map = {word: idx for idx, word in enumerate(token)}
+    idx_map = {idx: word for idx, word in enumerate(token)}
+    pickle.dump({'token_map': token_map, 'idx_map': idx_map}, 
+                 open('token_info.pkl', 'wb'))
+    return {'token_map': token_map, 'idx_map': idx_map}
 
 if __name__ == '__main__':
     ACCEPT = 'iclr/ICLR_accepted.xlsx'
