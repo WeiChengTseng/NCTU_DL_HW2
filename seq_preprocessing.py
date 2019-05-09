@@ -32,7 +32,7 @@ class SeqDataLoader():
         to_idx = lambda x: [self._token_map[token] for token in x.split()]
         self._idx_seq = list(map(to_idx, self._seq))
         self._device = device
-        self.n_token = len(self._token)
+        self.n_token = len(self._token_map)
 
         return
 

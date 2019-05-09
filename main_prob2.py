@@ -23,7 +23,7 @@ except:
 
 ACCEPT = 'iclr/ICLR_accepted.xlsx'
 REJECT = 'iclr/ICLR_rejected.xlsx'
-NUM_EPOCH = 200
+NUM_EPOCH = 50
 BATCH_SIZE = 50
 USE_CUDA = True
 PRINT_EVERY = 10
@@ -42,7 +42,7 @@ rejected.insert(1, "label", [0] * len(rejected))
 train_df = accepted[50:].append(rejected[50:])
 test_df = accepted[:50].append(rejected[:50])
 
-token_info = token_generation(accepted.append(rejected))
+token_info = token_generation(accepted.append(rejected), True)
 
 train_dl = SeqDataLoader(train_df, token_info, DEVICE)
 test_dl = SeqDataLoader(test_df, token_info, DEVICE)
@@ -67,9 +67,14 @@ for epoch in range(NUM_EPOCH):
 
         if step % PRINT_EVERY == 0:
             writer.add_scalar('train_loss', loss.data.item(), step)
+            print('Train Loss = {}'.format(loss.data.item()))
+            with torch.no_grad():
+                for seq_t, seq_len_t, labels_t in train_iter:
+                    pred_scores_t = lstm_model(seq_t, seq_len_t)
+                    loss_t = loss_fn(pred_scores_t, labels_t)
+                    writer.add_scalar('test_loss', loss_t.data.item(), step)
+                    print('Test Loss = {}'.format(loss_t.data.item()))
 
-        if step % PRINT_EVERY == 0:
-            print('Loss = {}'.format(loss.data.item()))
         step += 1
 
 writer.export_scalars_to_json(LOG_PATH + 'scalars.json')
