@@ -36,6 +36,8 @@ class LSTM(nn.Module):
         return pred_scores
 
 
+
+
 if __name__ == '__main__':
     model = LSTM(5, 10, 20, 2)
     inputs = torch.LongTensor(np.random.randn(3, 10, 5))

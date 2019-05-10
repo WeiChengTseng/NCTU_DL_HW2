@@ -21,9 +21,15 @@ try:
 except:
     print('Support CPU only')
 
+def calc_accuracy(pred_scores, Y):
+    with torch.no_grad():
+        _, pred = torch.max(pred_scores, 1)
+        train_acc = (pred == Y).float().mean()
+        return train_acc.data.item()
+
 ACCEPT = 'iclr/ICLR_accepted.xlsx'
 REJECT = 'iclr/ICLR_rejected.xlsx'
-NUM_EPOCH = 50
+NUM_EPOCH = 100
 BATCH_SIZE = 50
 USE_CUDA = True
 PRINT_EVERY = 10
@@ -67,13 +73,20 @@ for epoch in range(NUM_EPOCH):
 
         if step % PRINT_EVERY == 0:
             writer.add_scalar('train_loss', loss.data.item(), step)
+            writer.add_scalar('train_acc', calc_accuracy(pred_scores, labels), step)
             print('Train Loss = {}'.format(loss.data.item()))
+            
             with torch.no_grad():
-                for seq_t, seq_len_t, labels_t in train_iter:
+                acc_t, loss_list = [], []
+                test_iter = test_dl.batch_iter(bs=BATCH_SIZE)
+                for seq_t, seq_len_t, labels_t in test_iter:
                     pred_scores_t = lstm_model(seq_t, seq_len_t)
                     loss_t = loss_fn(pred_scores_t, labels_t)
-                    writer.add_scalar('test_loss', loss_t.data.item(), step)
-                    print('Test Loss = {}'.format(loss_t.data.item()))
+                    acc_t.append(calc_accuracy(pred_scores_t, labels_t))
+                    loss_list.append(loss_t.data.item())
+                writer.add_scalar('test_loss', np.mean(loss_list), step)
+                writer.add_scalar('test_acc', np.mean(acc_t), step)
+                print('Test Loss = {}'.format(np.mean(loss_list)))
 
         step += 1
 
