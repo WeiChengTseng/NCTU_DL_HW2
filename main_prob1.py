@@ -34,19 +34,26 @@ DEVICE = torch.device("cuda") if (torch.cuda.is_available()
                                   and USE_CUDA) else torch.device("cpu")
 print(DEVICE)
 
-writer = SummaryWriter('result/logs/')
+writer = SummaryWriter('result/logs/cnn')
 
-data_transform = torchvision.transforms.Compose([
+data_transform_train = torchvision.transforms.Compose([
     torchvision.transforms.RandomSizedCrop(224),
     torchvision.transforms.RandomHorizontalFlip(),
     torchvision.transforms.ToTensor(),
     torchvision.transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                      std=[0.229, 0.224, 0.225])
 ])
+
+data_transform_test = torchvision.transforms.Compose([
+    torchvision.transforms.RandomSizedCrop(224),
+    torchvision.transforms.ToTensor(),
+    torchvision.transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                                     std=[0.229, 0.224, 0.225])
+])
 train_ds = torchvision.datasets.ImageFolder(root='./animal-10/train/',
-                                            transform=data_transform)
+                                            transform=data_transform_train)
 val_ds = torchvision.datasets.ImageFolder(root='./animal-10/val/',
-                                          transform=data_transform)
+                                          transform=data_transform_test)
 
 train_dl = torch.utils.data.DataLoader(train_ds,
                                        batch_size=BATCH_SIZE,
@@ -63,7 +70,7 @@ optimizer = optim.Adam(model.parameters(), lr=0.001)
 step = 0
 
 for epoch in range(NUM_EPOCH):
-    running_loss = 0.0
+
     for i, data in enumerate(train_dl):
         inputs, labels = data
         optimizer.zero_grad()
@@ -73,12 +80,10 @@ for epoch in range(NUM_EPOCH):
         loss.backward()
         optimizer.step()
 
-        running_loss += loss.item()
         if i % PRINT_EVERY == 0:
-            loss_ave = running_loss / PRINT_EVERY
-            print('[%d, %d] loss: %.3f' % (epoch, i, loss_ave))
-            writer.add_scalar('train_loss', loss_ave, step)
-            running_loss = 0.0
+            print('[%d, %d] loss: %.3f' % (epoch, i, loss.item()))
+            writer.add_scalar('train_loss', loss.item(), step)
+
             acc = calc_accuracy(outputs, labels.to(DEVICE))
             writer.add_scalar('train_acc', acc, step)
 
