@@ -39,13 +39,14 @@ writer = SummaryWriter('result/logs/cnn')
 data_transform_train = torchvision.transforms.Compose([
     torchvision.transforms.RandomSizedCrop(224),
     torchvision.transforms.RandomHorizontalFlip(),
+    torchvision.transforms.RandomVerticalFlip(),
     torchvision.transforms.ToTensor(),
     torchvision.transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                      std=[0.229, 0.224, 0.225])
 ])
 
 data_transform_test = torchvision.transforms.Compose([
-    torchvision.transforms.RandomSizedCrop(224),
+    torchvision.transforms.Resize(224),
     torchvision.transforms.ToTensor(),
     torchvision.transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                      std=[0.229, 0.224, 0.225])
@@ -88,7 +89,7 @@ for epoch in range(NUM_EPOCH):
             writer.add_scalar('train_acc', acc, step)
 
             with torch.no_grad():
-                test_loss, acc_test = 0.0, []
+                test_loss, acc_test = [], []
                 optimizer.zero_grad()
 
                 n_epoch_test = len(val_ds) // BATCH_SIZE
@@ -97,10 +98,10 @@ for epoch in range(NUM_EPOCH):
                     outputs_t = model(inputs_t.to(DEVICE))
                     loss_t = criterion(outputs_t, labels_t.to(DEVICE))
 
-                    test_loss += loss_t
+                    test_loss.append(loss_t.item())
                     acc_test.append(
                         calc_accuracy(outputs_t, labels_t.to(DEVICE)))
-                writer.add_scalar('test_loss', test_loss, step)
+                writer.add_scalar('test_loss', np.mean(test_loss), step)
                 writer.add_scalar('test_acc', np.mean(acc_test), step)
         step += 1
 

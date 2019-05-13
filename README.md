@@ -6,6 +6,9 @@
 ## Problem1: Convolutional Neural Network for Image Recognition
 1. Please describe in details how to preprocess the images in Animal-10 dataset with different resolutions and explain why. You have to submit your preprocessing code.  
 2. Please implement a CNN for image recognition. You need to design the network archi- tecture, describe your network architecture and analyze the effect of different settings including stride size and filter/kernel size. Plot learning curve, classification accuracy of training and test sets as displayed in above figure.
-3. Show some examples of correctly and incorrectly classified images, list your accuracy for each test classes (similar to the following figure), and discuss about your results.
+3. Show some examples of correctly and incorrectly classified images, list your accuracy for each test classes, and discuss about your results.
 
 ## Problem2: Recurrent Neural Network for Prediction of Paper Acceptance
+1. Please construct a standard RNN for acceptance prediction.
+2. Redo (1) by using the Long Short-Term Memory network (LSTM).
+3. Please discuss the difference between (1) and (2).
