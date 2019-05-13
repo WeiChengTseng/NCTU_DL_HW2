@@ -12,9 +12,10 @@ class LSTM(nn.Module):
                  embedding_dim,
                  hidden_size,
                  output_size,
+                 padding_idx,
                  ckpt=None):
         super(LSTM, self).__init__()
-        self._emb = nn.Embedding(vocab_size, embedding_dim)
+        self._emb = nn.Embedding(vocab_size, embedding_dim, padding_idx=padding_idx)
         self._hidden_size = hidden_size
         self._final_pred = nn.Linear(hidden_size, output_size)
 

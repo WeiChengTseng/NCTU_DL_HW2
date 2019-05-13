@@ -31,18 +31,23 @@ def calc_accuracy(pred_scores, Y):
 
 ACCEPT = 'iclr/ICLR_accepted.xlsx'
 REJECT = 'iclr/ICLR_rejected.xlsx'
+MAX_LEN = 10
+
 NUM_EPOCH = 50
 BATCH_SIZE = 50
+
 USE_CUDA = True
 PRINT_EVERY = 20
+
 EMBEDDING_DIM = 10
 HIDDEN_DIM = 10
 LR_MILESTONE = 5
 LR_DECAY_RATE = 0.99
 
+
 DEVICE = torch.device("cuda") if (torch.cuda.is_available()
                                   and USE_CUDA) else torch.device("cpu")
-LOG_PATH = 'result/logs/lstm_early_stop_bs50_hidden10_embed10_lrdecay99'
+LOG_PATH = 'result/logs/lstm_early_stop_bs50_hidden10_embed10_lrdecay99_pad0'
 
 accepted = pd.read_excel(ACCEPT, index_col=0)
 rejected = pd.read_excel(REJECT, index_col=0)
@@ -55,10 +60,10 @@ test_df = accepted[:50].append(rejected[:50])
 
 token_info = token_generation(accepted.append(rejected), True)
 
-train_dl = SeqDataLoader(train_df, token_info, DEVICE)
-test_dl = SeqDataLoader(test_df, token_info, DEVICE)
-
-lstm_model = LSTM(train_dl.n_token, EMBEDDING_DIM, HIDDEN_DIM, 2).to(DEVICE)
+train_dl = SeqDataLoader(train_df, token_info, max_len=MAX_LEN, device=DEVICE)
+test_dl = SeqDataLoader(test_df, token_info, max_len=MAX_LEN, device=DEVICE)
+pad_idx = token_info['token_map']['<pad>']
+lstm_model = LSTM(train_dl.n_token, EMBEDDING_DIM, HIDDEN_DIM, 2, pad_idx).to(DEVICE)
 
 writer_train = SummaryWriter(LOG_PATH + '/train')
 writer_test = SummaryWriter(LOG_PATH + '/test')
