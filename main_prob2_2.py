@@ -44,7 +44,6 @@ HIDDEN_DIM = 10
 LR_MILESTONE = 5
 LR_DECAY_RATE = 0.99
 
-
 DEVICE = torch.device("cuda") if (torch.cuda.is_available()
                                   and USE_CUDA) else torch.device("cpu")
 LOG_PATH = 'result/logs/lstm_early_stop_bs50_hidden10_embed10_lrdecay99_pad0'
@@ -63,7 +62,8 @@ token_info = token_generation(accepted.append(rejected), True)
 train_dl = SeqDataLoader(train_df, token_info, max_len=MAX_LEN, device=DEVICE)
 test_dl = SeqDataLoader(test_df, token_info, max_len=MAX_LEN, device=DEVICE)
 pad_idx = token_info['token_map']['<pad>']
-lstm_model = LSTM(train_dl.n_token, EMBEDDING_DIM, HIDDEN_DIM, 2, pad_idx).to(DEVICE)
+lstm_model = LSTM(train_dl.n_token, EMBEDDING_DIM, HIDDEN_DIM, 2,
+                  pad_idx).to(DEVICE)
 
 writer_train = SummaryWriter(LOG_PATH + '/train')
 writer_test = SummaryWriter(LOG_PATH + '/test')
@@ -85,8 +85,8 @@ for epoch in range(NUM_EPOCH):
 
         if step % PRINT_EVERY == 0:
             writer_train.add_scalar('loss', loss.data.item(), step)
-            writer_train.add_scalar('accuracy', calc_accuracy(pred_scores, labels),
-                              step)
+            writer_train.add_scalar('accuracy',
+                                    calc_accuracy(pred_scores, labels), step)
             print('Train Loss = {}'.format(loss.data.item()))
 
             with torch.no_grad():

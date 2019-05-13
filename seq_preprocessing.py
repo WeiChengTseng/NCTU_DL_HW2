@@ -17,7 +17,7 @@ import pickle
 
 
 class SeqDataLoader():
-    def __init__(self, dataframe, token_info, max_len=10 ,device=None):
+    def __init__(self, dataframe, token_info, max_len=10, device=None):
         df_value = dataframe.values
         seq_list, self._seq_label = df_value[:, 0], df_value[:, 1]
         to_lower = lambda x: '<bos> ' + x.lower() + ' <eos>'
@@ -44,7 +44,10 @@ class SeqDataLoader():
         idx = 0
         self._shuffle()
         while (idx + bs <= len(self)):
-            seq_len = np.array([max(len(s), self._seq_max_len) for s in self._idx_seq[idx:idx + bs]],
+            seq_len = np.array([
+                max(len(s), self._seq_max_len)
+                for s in self._idx_seq[idx:idx + bs]
+            ],
                                dtype=int)
             seq_sort = np.argsort(seq_len)[::-1]
             seq_label = np.array(self._seq_label[idx:idx + bs])
@@ -52,8 +55,8 @@ class SeqDataLoader():
 
             max_len = self._seq_max_len
             seq = np.array([
-                s[: max_len] + [self._token_map['<pad>']] * max((max_len - len(s)), 0)
-                for s in self._idx_seq[idx:idx + bs]
+                s[:max_len] + [self._token_map['<pad>']] * max(
+                    (max_len - len(s)), 0) for s in self._idx_seq[idx:idx + bs]
             ],
                            dtype=int)
 
