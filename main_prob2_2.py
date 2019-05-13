@@ -31,15 +31,18 @@ def calc_accuracy(pred_scores, Y):
 
 ACCEPT = 'iclr/ICLR_accepted.xlsx'
 REJECT = 'iclr/ICLR_rejected.xlsx'
-NUM_EPOCH = 100
+NUM_EPOCH = 50
 BATCH_SIZE = 50
 USE_CUDA = True
-PRINT_EVERY = 10
+PRINT_EVERY = 20
 EMBEDDING_DIM = 10
 HIDDEN_DIM = 10
+LR_MILESTONE = 5
+LR_DECAY_RATE = 0.99
+
 DEVICE = torch.device("cuda") if (torch.cuda.is_available()
                                   and USE_CUDA) else torch.device("cpu")
-LOG_PATH = 'result/logs/lstm'
+LOG_PATH = 'result/logs/lstm_early_stop_bs50_hidden10_embed10_lrdecay99'
 
 accepted = pd.read_excel(ACCEPT, index_col=0)
 rejected = pd.read_excel(REJECT, index_col=0)
@@ -57,9 +60,11 @@ test_dl = SeqDataLoader(test_df, token_info, DEVICE)
 
 lstm_model = LSTM(train_dl.n_token, EMBEDDING_DIM, HIDDEN_DIM, 2).to(DEVICE)
 
-writer = SummaryWriter(LOG_PATH)
+writer_train = SummaryWriter(LOG_PATH + '/train')
+writer_test = SummaryWriter(LOG_PATH + '/test')
 loss_fn = nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(lstm_model.parameters())
+scheduler = optim.lr_scheduler.ExponentialLR(optimizer, LR_DECAY_RATE)
 
 step = 0
 for epoch in range(NUM_EPOCH):
@@ -74,23 +79,22 @@ for epoch in range(NUM_EPOCH):
         optimizer.step()
 
         if step % PRINT_EVERY == 0:
-            writer.add_scalar('train_loss', loss.data.item(), step)
-            writer.add_scalar('train_acc', calc_accuracy(pred_scores, labels),
+            writer_train.add_scalar('loss', loss.data.item(), step)
+            writer_train.add_scalar('accuracy', calc_accuracy(pred_scores, labels),
                               step)
             print('Train Loss = {}'.format(loss.data.item()))
 
             with torch.no_grad():
                 acc_t, loss_list = [], []
-                test_iter = test_dl.batch_iter(bs=BATCH_SIZE)
+                test_iter = test_dl.batch_iter(bs=len(test_dl))
                 for seq_t, seq_len_t, labels_t in test_iter:
                     pred_scores_t = lstm_model(seq_t, seq_len_t)
                     loss_t = loss_fn(pred_scores_t, labels_t)
                     acc_t.append(calc_accuracy(pred_scores_t, labels_t))
                     loss_list.append(loss_t.data.item())
-                writer.add_scalar('test_loss', np.mean(loss_list), step)
-                writer.add_scalar('test_acc', np.mean(acc_t), step)
+                writer_test.add_scalar('loss', np.mean(loss_list), step)
+                writer_test.add_scalar('accuracy', np.mean(acc_t), step)
                 print('Test Loss = {}'.format(np.mean(loss_list)))
 
         step += 1
-
-writer.export_scalars_to_json(LOG_PATH + 'scalars.json')
+    scheduler.step()

@@ -42,7 +42,7 @@ class SeqDataLoader():
     def batch_iter(self, bs=10):
         idx = 0
         self._shuffle()
-        while (idx + bs < len(self)):
+        while (idx + bs <= len(self)):
             seq_len = np.array([len(s) for s in self._idx_seq[idx:idx + bs]],
                                dtype=int)
             seq_sort = np.argsort(seq_len)[::-1]
