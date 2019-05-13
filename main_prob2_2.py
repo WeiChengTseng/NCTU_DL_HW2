@@ -41,12 +41,11 @@ PRINT_EVERY = 20
 
 EMBEDDING_DIM = 10
 HIDDEN_DIM = 10
-LR_MILESTONE = 5
-LR_DECAY_RATE = 0.99
+LR_DECAY_RATE = 1
 
 DEVICE = torch.device("cuda") if (torch.cuda.is_available()
                                   and USE_CUDA) else torch.device("cpu")
-LOG_PATH = 'result/logs/lstm_early_stop_bs50_hidden10_embed10_lrdecay99_pad0'
+LOG_PATH = 'result/logs/lstm_early_stop_bs50_hidden10_embed10_lrdecay1_pad0_max10'
 
 accepted = pd.read_excel(ACCEPT, index_col=0)
 rejected = pd.read_excel(REJECT, index_col=0)

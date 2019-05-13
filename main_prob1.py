@@ -11,7 +11,7 @@ import pdb
 import argparse
 import os
 
-from cnn_model import CNN
+from cnn_model import CNN, DenseNet
 
 try:
     os.environ["CUDA_VISIBLE_DEVICES"] = "0"
@@ -30,11 +30,13 @@ NUM_EPOCH = 20
 BATCH_SIZE = 50
 USE_CUDA = True
 PRINT_EVERY = 10
+LOG_PATH = 'result/logs/cnn'
 DEVICE = torch.device("cuda") if (torch.cuda.is_available()
                                   and USE_CUDA) else torch.device("cpu")
 print(DEVICE)
 
-writer = SummaryWriter('result/logs/cnn')
+writer_train = SummaryWriter(LOG_PATH + '/train')
+writer_test = SummaryWriter(LOG_PATH + '/test')
 
 data_transform_train = torchvision.transforms.Compose([
     torchvision.transforms.RandomSizedCrop(224),
@@ -66,6 +68,8 @@ val_dl = torch.utils.data.DataLoader(val_ds,
                                      num_workers=4)
 
 model = CNN().to(DEVICE)
+net = densenet.DenseNet(growthRate=12, depth=100, reduction=0.5,
+                            bottleneck=True, nClasses=10)
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=0.001)
 step = 0
@@ -83,10 +87,10 @@ for epoch in range(NUM_EPOCH):
 
         if i % PRINT_EVERY == 0:
             print('[%d, %d] loss: %.3f' % (epoch, i, loss.item()))
-            writer.add_scalar('train_loss', loss.item(), step)
+            writer_train.add_scalar('loss', loss.item(), step)
 
             acc = calc_accuracy(outputs, labels.to(DEVICE))
-            writer.add_scalar('train_acc', acc, step)
+            writer_train.add_scalar('accuracy', acc, step)
 
             with torch.no_grad():
                 test_loss, acc_test = [], []
@@ -101,8 +105,8 @@ for epoch in range(NUM_EPOCH):
                     test_loss.append(loss_t.item())
                     acc_test.append(
                         calc_accuracy(outputs_t, labels_t.to(DEVICE)))
-                writer.add_scalar('test_loss', np.mean(test_loss), step)
-                writer.add_scalar('test_acc', np.mean(acc_test), step)
+                writer_test.add_scalar('loss', np.mean(test_loss), step)
+                writer_test.add_scalar('accuracy', np.mean(acc_test), step)
         step += 1
 
 print('Finished Training')

@@ -26,7 +26,6 @@ class LSTM(nn.Module):
         return
 
     def forward(self, src, src_lengths):
-
         src_emb = self._emb(src)
         packed_src = nn.utils.rnn.pack_padded_sequence(src_emb,
                                                        src_lengths,

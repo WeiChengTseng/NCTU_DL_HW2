@@ -45,13 +45,12 @@ class SeqDataLoader():
         self._shuffle()
         while (idx + bs <= len(self)):
             seq_len = np.array([
-                max(len(s), self._seq_max_len)
+                min(len(s), self._seq_max_len)
                 for s in self._idx_seq[idx:idx + bs]
             ],
                                dtype=int)
             seq_sort = np.argsort(seq_len)[::-1]
             seq_label = np.array(self._seq_label[idx:idx + bs])
-            print(max(seq_len))
 
             max_len = self._seq_max_len
             seq = np.array([
