@@ -43,10 +43,10 @@ class SeqDataLoader():
         idx = 0
         self._shuffle()
         while (idx + bs < len(self)):
-            seq_len = np.array(
-                [len(s) for s in self._idx_seq[idx:idx + bs]], dtype=int)
+            seq_len = np.array([len(s) for s in self._idx_seq[idx:idx + bs]],
+                               dtype=int)
             seq_sort = np.argsort(seq_len)[::-1]
-            seq_label = np.array(self._seq_label[idx: idx + bs])
+            seq_label = np.array(self._seq_label[idx:idx + bs])
             max_len = max(seq_len)
             seq = np.array([
                 s + [self._token_map['<pad>']] * (max_len - len(s))
@@ -54,17 +54,20 @@ class SeqDataLoader():
             ],
                            dtype=int)
 
-            seq_len, seq, seq_label = seq_len[seq_sort], seq[seq_sort], seq_label[seq_sort]
+            seq_len, seq, seq_label = seq_len[seq_sort], seq[
+                seq_sort], seq_label[seq_sort]
             idx += bs
 
-            yield torch.LongTensor(seq).to(self._device), torch.LongTensor(seq_len).to(
-                self._device), torch.LongTensor(seq_label).to(self._device)
+            yield torch.LongTensor(seq).to(
+                self._device), torch.LongTensor(seq_len).to(
+                    self._device), torch.LongTensor(seq_label).to(self._device)
 
     def _shuffle(self):
         seqs = list(zip(self._seq, self._idx_seq, self._seq_label))
         random.shuffle(seqs)
         self._seq, self._idx_seq, self._seq_label = zip(*seqs)
         return
+
 
 def token_generation(dataframe, preload=False):
     if preload:
@@ -77,18 +80,20 @@ def token_generation(dataframe, preload=False):
 
     token_map = {word: idx for idx, word in enumerate(token)}
     idx_map = {idx: word for idx, word in enumerate(token)}
-    pickle.dump({'token_map': token_map, 'idx_map': idx_map}, 
-                 open('token_info.pkl', 'wb'))
+    pickle.dump({
+        'token_map': token_map,
+        'idx_map': idx_map
+    }, open('token_info.pkl', 'wb'))
     return {'token_map': token_map, 'idx_map': idx_map}
+
 
 if __name__ == '__main__':
     ACCEPT = 'iclr/ICLR_accepted.xlsx'
     REJECT = 'iclr/ICLR_rejected.xlsx'
     USE_CUDA = True
     DEVICE = torch.device("cuda") if (torch.cuda.is_available()
-                                    and USE_CUDA) else torch.device("cpu")
+                                      and USE_CUDA) else torch.device("cpu")
 
-    
     accepted = pd.read_excel(ACCEPT, index_col=0)
     rejected = pd.read_excel(REJECT, index_col=0)
 

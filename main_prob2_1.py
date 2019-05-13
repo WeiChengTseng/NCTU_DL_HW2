@@ -21,11 +21,13 @@ try:
 except:
     print('Support CPU only')
 
+
 def calc_accuracy(pred_scores, Y):
     with torch.no_grad():
         _, pred = torch.max(pred_scores, 1)
         train_acc = (pred == Y).float().mean()
         return train_acc.data.item()
+
 
 ACCEPT = 'iclr/ICLR_accepted.xlsx'
 REJECT = 'iclr/ICLR_rejected.xlsx'
@@ -73,9 +75,10 @@ for epoch in range(NUM_EPOCH):
 
         if step % PRINT_EVERY == 0:
             writer.add_scalar('train_loss', loss.data.item(), step)
-            writer.add_scalar('train_acc', calc_accuracy(pred_scores, labels), step)
+            writer.add_scalar('train_acc', calc_accuracy(pred_scores, labels),
+                              step)
             print('Train Loss = {}'.format(loss.data.item()))
-            
+
             with torch.no_grad():
                 acc_t, loss_list = [], []
                 test_iter = test_dl.batch_iter(bs=BATCH_SIZE)
