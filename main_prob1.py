@@ -67,9 +67,9 @@ val_dl = torch.utils.data.DataLoader(val_ds,
                                      shuffle=True,
                                      num_workers=4)
 
-model = CNN().to(DEVICE)
-net = densenet.DenseNet(growthRate=12, depth=100, reduction=0.5,
-                            bottleneck=True, nClasses=10)
+# model = CNN().to(DEVICE)
+model = densenet.DenseNet(growthRate=4, depth=10, reduction=0.5,
+                            bottleneck=True, nClasses=10).to(DEVICE)
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=0.001)
 step = 0
