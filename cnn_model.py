@@ -122,7 +122,7 @@ class DenseNet(nn.Module):
         nChannels += nDenseBlocks * growthRate
 
         self.bn1 = nn.BatchNorm2d(nChannels)
-        self.fc = nn.Linear(441, nClasses)
+        self.fc = nn.Linear(882, nClasses)
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d):

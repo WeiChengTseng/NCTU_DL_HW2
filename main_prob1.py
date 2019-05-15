@@ -31,9 +31,10 @@ BATCH_SIZE = 50
 USE_CUDA = True
 PRINT_EVERY = 50
 LOG_PATH = 'result/logs/densenet'
+SVAE_PATH = 'result/ckpt/densenet'
 DEVICE = torch.device("cuda") if (torch.cuda.is_available()
                                   and USE_CUDA) else torch.device("cpu")
-print(DEVICE)
+print('use device: ', DEVICE)
 
 writer_train = SummaryWriter(LOG_PATH + '/train')
 writer_test = SummaryWriter(LOG_PATH + '/test')
@@ -68,7 +69,7 @@ val_dl = torch.utils.data.DataLoader(val_ds,
                                      num_workers=4)
 
 # model = CNN().to(DEVICE)
-model = DenseNet(growthRate=4,
+model = DenseNet(growthRate=8,
                  depth=10,
                  reduction=0.5,
                  bottleneck=True,
@@ -117,3 +118,8 @@ for epoch in range(NUM_EPOCH):
         step += 1
 
 print('Finished Training')
+torch.save(
+    {
+        'model': model.state_dict(),
+        'optimizer': optimizer.state_dict(),
+    }, SVAE_PATH)
