@@ -2,3 +2,4 @@ animal-10/
 __pycache__/
 .vscode/
 logs/
+*.pth
