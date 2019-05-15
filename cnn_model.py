@@ -7,6 +7,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import tensorboardX
 import pdb
+import math
 
 
 class CNN(nn.Module):
@@ -121,7 +122,7 @@ class DenseNet(nn.Module):
         nChannels += nDenseBlocks * growthRate
 
         self.bn1 = nn.BatchNorm2d(nChannels)
-        self.fc = nn.Linear(nChannels, nClasses)
+        self.fc = nn.Linear(441, nClasses)
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
@@ -144,10 +145,11 @@ class DenseNet(nn.Module):
         return nn.Sequential(*layers)
 
     def forward(self, x):
+        bs = x.shape[0]
         out = self.conv1(x)
         out = self.trans1(self.dense1(out))
         out = self.trans2(self.dense2(out))
         out = self.dense3(out)
-        out = torch.squeeze(F.avg_pool2d(F.relu(self.bn1(out)), 8))
-        out = F.log_softmax(self.fc(out))
+        out = F.avg_pool2d(F.relu(self.bn1(out)), 8)
+        out = F.log_softmax(self.fc(out.view(bs, -1)))
         return out
