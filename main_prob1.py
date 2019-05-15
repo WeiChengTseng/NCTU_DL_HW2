@@ -31,7 +31,7 @@ BATCH_SIZE = 50
 USE_CUDA = True
 PRINT_EVERY = 50
 LOG_PATH = 'result/logs/densenet'
-SVAE_PATH = 'result/ckpt/densenet'
+SVAE_PATH = 'result/ckpt/densenet.pth'
 DEVICE = torch.device("cuda") if (torch.cuda.is_available()
                                   and USE_CUDA) else torch.device("cpu")
 print('use device: ', DEVICE)
