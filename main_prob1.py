@@ -48,7 +48,7 @@ data_transform_train = torchvision.transforms.Compose([
 ])
 
 data_transform_test = torchvision.transforms.Compose([
-    torchvision.transforms.Resize(224),
+    torchvision.transforms.Resize((224, 224)),
     torchvision.transforms.ToTensor(),
     torchvision.transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                      std=[0.229, 0.224, 0.225])
@@ -80,6 +80,7 @@ step = 0
 for epoch in range(NUM_EPOCH):
 
     for i, data in enumerate(train_dl):
+        model.train()
         inputs, labels = data
         optimizer.zero_grad()
 
@@ -89,6 +90,8 @@ for epoch in range(NUM_EPOCH):
         optimizer.step()
 
         if i % PRINT_EVERY == 0:
+            optimizer.zero_grad()
+            model.eval()
             print('[%d, %d] loss: %.3f' % (epoch, i, loss.item()))
             writer_train.add_scalar('loss', loss.item(), step)
 
@@ -100,9 +103,13 @@ for epoch in range(NUM_EPOCH):
                 optimizer.zero_grad()
 
                 n_epoch_test = len(val_ds) // BATCH_SIZE
+                print('in no_grad()')
                 for j, data_t in enumerate(val_dl):
+
+                    print('validation')
                     inputs_t, labels_t = data_t
                     outputs_t = model(inputs_t.to(DEVICE))
+                    print('output')
                     loss_t = criterion(outputs_t, labels_t.to(DEVICE))
 
                     test_loss.append(loss_t.item())
