@@ -26,7 +26,7 @@ def calc_accuracy(pred_scores, Y):
         return train_acc.cpu().numpy()
 
 
-NUM_EPOCH = 20
+NUM_EPOCH = 50
 BATCH_SIZE = 50
 USE_CUDA = True
 PRINT_EVERY = 50
