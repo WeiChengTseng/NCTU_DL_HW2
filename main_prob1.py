@@ -14,7 +14,7 @@ import os
 from cnn_model import CNN, DenseNet
 
 try:
-    os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+    os.environ["CUDA_VISIBLE_DEVICES"] = "3"
 except:
     print('Support CPU only')
 
@@ -26,12 +26,13 @@ def calc_accuracy(pred_scores, Y):
         return train_acc.cpu().numpy()
 
 
-NUM_EPOCH = 50
+NUM_EPOCH = 150
 BATCH_SIZE = 50
 USE_CUDA = True
 PRINT_EVERY = 50
-LOG_PATH = 'result/logs/densenet'
-SVAE_PATH = 'result/ckpt/densenet.pth'
+CKPT_FILE = None
+LOG_PATH = 'result/logs/densenet_fc3_depth13'
+SVAE_PATH = 'result/ckpt/densenet_fc3_depth13.pth'
 DEVICE = torch.device("cuda") if (torch.cuda.is_available()
                                   and USE_CUDA) else torch.device("cpu")
 print('use device: ', DEVICE)
@@ -40,6 +41,7 @@ writer_train = SummaryWriter(LOG_PATH + '/train')
 writer_test = SummaryWriter(LOG_PATH + '/test')
 
 data_transform_train = torchvision.transforms.Compose([
+    # torchvision.transforms.RandomSizedCrop(224, scale=(0.6, 1.0)),
     torchvision.transforms.RandomSizedCrop(224),
     torchvision.transforms.RandomHorizontalFlip(),
     torchvision.transforms.RandomVerticalFlip(),
@@ -70,13 +72,19 @@ val_dl = torch.utils.data.DataLoader(val_ds,
 
 # model = CNN().to(DEVICE)
 model = DenseNet(growthRate=8,
-                 depth=10,
+                 depth=13,
                  reduction=0.5,
                  bottleneck=True,
                  nClasses=10).to(DEVICE)
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=0.001)
 step = 0
+
+if CKPT_FILE:
+    print('Load checkpoint!!')
+    checkpoint = torch.load(CKPT_FILE)
+    model.load_state_dict(checkpoint['model'])
+    optimizer.load_state_dict(checkpoint['optimizer'])
 
 for epoch in range(NUM_EPOCH):
 
@@ -116,10 +124,11 @@ for epoch in range(NUM_EPOCH):
                 writer_test.add_scalar('loss', np.mean(test_loss), step)
                 writer_test.add_scalar('accuracy', np.mean(acc_test), step)
         step += 1
+    if epoch % 10 == 0:
+        torch.save(
+            {
+                'model': model.state_dict(),
+                'optimizer': optimizer.state_dict(),
+            }, SVAE_PATH)
 
 print('Finished Training')
-torch.save(
-    {
-        'model': model.state_dict(),
-        'optimizer': optimizer.state_dict(),
-    }, SVAE_PATH)
