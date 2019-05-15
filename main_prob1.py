@@ -29,7 +29,7 @@ def calc_accuracy(pred_scores, Y):
 NUM_EPOCH = 20
 BATCH_SIZE = 50
 USE_CUDA = True
-PRINT_EVERY = 10
+PRINT_EVERY = 50
 LOG_PATH = 'result/logs/densenet'
 DEVICE = torch.device("cuda") if (torch.cuda.is_available()
                                   and USE_CUDA) else torch.device("cpu")
@@ -103,13 +103,10 @@ for epoch in range(NUM_EPOCH):
                 optimizer.zero_grad()
 
                 n_epoch_test = len(val_ds) // BATCH_SIZE
-                print('in no_grad()')
                 for j, data_t in enumerate(val_dl):
 
-                    print('validation')
                     inputs_t, labels_t = data_t
                     outputs_t = model(inputs_t.to(DEVICE))
-                    print('output')
                     loss_t = criterion(outputs_t, labels_t.to(DEVICE))
 
                     test_loss.append(loss_t.item())
