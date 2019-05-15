@@ -30,7 +30,7 @@ NUM_EPOCH = 20
 BATCH_SIZE = 50
 USE_CUDA = True
 PRINT_EVERY = 10
-LOG_PATH = 'result/logs/cnn'
+LOG_PATH = 'result/logs/densenet'
 DEVICE = torch.device("cuda") if (torch.cuda.is_available()
                                   and USE_CUDA) else torch.device("cpu")
 print(DEVICE)
