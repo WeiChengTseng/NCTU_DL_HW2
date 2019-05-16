@@ -12,9 +12,10 @@ import argparse
 import os
 
 from cnn_model import CNN, DenseNet
+from densenet import DenseNetAnimal10
 
 try:
-    os.environ["CUDA_VISIBLE_DEVICES"] = "3"
+    os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 except:
     print('Support CPU only')
 
@@ -27,12 +28,19 @@ def calc_accuracy(pred_scores, Y):
 
 
 NUM_EPOCH = 150
-BATCH_SIZE = 50
+BATCH_SIZE = 25
 USE_CUDA = True
 PRINT_EVERY = 50
 CKPT_FILE = None
-LOG_PATH = 'result/logs/densenet_fc3_depth13'
-SVAE_PATH = 'result/ckpt/densenet_fc3_depth13.pth'
+# FC_BATCHNORM = True
+# FC_DROPOUT = True
+# MUL_FC = False
+K = 24
+DEPTH = 10
+WEIGHT_DECAY = 1e-7
+NAME = 'DenseNet_depth{}_k{}_bs{}_wd{}_wobc'.format(DEPTH, K, BATCH_SIZE, WEIGHT_DECAY)
+LOG_PATH = 'result/logs/' + NAME
+SVAE_PATH = 'result/ckpt/{}.pth'.format(NAME)
 DEVICE = torch.device("cuda") if (torch.cuda.is_available()
                                   and USE_CUDA) else torch.device("cpu")
 print('use device: ', DEVICE)
@@ -41,8 +49,8 @@ writer_train = SummaryWriter(LOG_PATH + '/train')
 writer_test = SummaryWriter(LOG_PATH + '/test')
 
 data_transform_train = torchvision.transforms.Compose([
-    # torchvision.transforms.RandomSizedCrop(224, scale=(0.6, 1.0)),
-    torchvision.transforms.RandomSizedCrop(224),
+    torchvision.transforms.RandomSizedCrop(224, scale=(0.8, 1.0)),
+    # torchvision.transforms.RandomSizedCrop(224),
     torchvision.transforms.RandomHorizontalFlip(),
     torchvision.transforms.RandomVerticalFlip(),
     torchvision.transforms.ToTensor(),
@@ -71,15 +79,18 @@ val_dl = torch.utils.data.DataLoader(val_ds,
                                      num_workers=4)
 
 # model = CNN().to(DEVICE)
-model = DenseNet(growthRate=8,
-                 depth=13,
+model = DenseNet(growthRate=K,
+                 depth=DEPTH,
                  reduction=0.5,
-                 bottleneck=True,
+                 bottleneck=False,
                  nClasses=10).to(DEVICE)
+# model = DenseNetAnimal10(K).to(DEVICE)
 criterion = nn.CrossEntropyLoss()
-optimizer = optim.Adam(model.parameters(), lr=0.001)
+# optimizer = optim.Adam(model.parameters(), lr=0.001)
+optimizer = optim.SGD(model.parameters(), lr=1e-1,
+                            momentum=0.9, weight_decay=WEIGHT_DECAY)
 step = 0
-
+print(NAME)
 if CKPT_FILE:
     print('Load checkpoint!!')
     checkpoint = torch.load(CKPT_FILE)
@@ -129,6 +140,9 @@ for epoch in range(NUM_EPOCH):
             {
                 'model': model.state_dict(),
                 'optimizer': optimizer.state_dict(),
+                'K': K,
+                'BATCH_SIZE': BATCH_SIZE,
+                'WEIGHT_DECAY': WEIGHT_DECAY
             }, SVAE_PATH)
 
 print('Finished Training')

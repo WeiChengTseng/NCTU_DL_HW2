@@ -17,23 +17,110 @@ class CNN(nn.Module):
         self.conv2 = nn.Conv2d(64, 64, 5)
         self.conv3 = nn.Conv2d(64, 64, 5)
         self.pool = nn.MaxPool2d(2, 2)
-        self.bn1d1 = nn.BatchNorm2d()
-        self.fc1 = nn.Linear(16 * 24 * 24, 120)
-        self.fc2 = nn.Linear(120, 84)
-        self.fc3 = nn.Linear(84, 10)
+        self.bn2d1 = nn.BatchNorm2d(64)
+        self.bn2d2 = nn.BatchNorm2d(64)
+        self.bn2d3 = nn.BatchNorm2d(64)
+        self.fc1 = nn.Linear(64 * 24 * 24, 256)
+        self.fc2 = nn.Linear(256, 128)
+        self.fc3 = nn.Linear(128, 10)
+        self.bn1d1 = nn.BatchNorm1d(256)
+        self.bn1d2 = nn.BatchNorm1d(128)
+
         return
 
     def forward(self, x):
         bs = x.shape[0]
-        x = self.pool(F.relu(self.conv1(x)))
-        x = self.pool(F.relu(self.conv2(x)))
-        x = self.pool(F.relu(self.conv3(x)))
+        x = self.pool(F.relu(self.bn2d1(self.conv1(x))))
+        x = self.pool(F.relu(self.bn2d2(self.conv2(x))))
+        x = self.pool(F.relu(self.bn2d3(self.conv3(x))))
 
         x = x.view(bs, -1)
-        x = F.relu(self.fc1(x))
-        x = F.relu(self.fc2(x))
+        x = F.relu(F.dropout(self.bn1d1(self.fc1(x)), training=self.training))
+        x = F.relu(F.dropout(self.bn1d2(self.fc2(x)), training=self.training))
         x = self.fc3(x)
         return x
+
+class SmallCNN(nn.Module):
+    def __init__(self):
+        super(SmallCNN, self).__init__()
+        self.conv1 = nn.Conv2d(3, 64, 3)
+        self.conv2 = nn.Conv2d(64, 64, 3)
+        self.conv3 = nn.Conv2d(64, 64, 3)
+        self.conv4 = nn.Conv2d(64, 64, 3)
+        self.pool = nn.MaxPool2d(2, 2)
+        self.bn2d1 = nn.BatchNorm2d(64)
+        self.bn2d2 = nn.BatchNorm2d(64)
+        self.bn2d3 = nn.BatchNorm2d(64)
+        self.bn2d4 = nn.BatchNorm2d(64)
+        self.fc1 = nn.Linear(64 * 12 * 12, 256)
+        self.fc2 = nn.Linear(256, 128)
+        self.fc3 = nn.Linear(128, 10)
+        self.bn1d1 = nn.BatchNorm1d(256)
+        self.bn1d2 = nn.BatchNorm1d(128)
+
+        return
+
+    def forward(self, x):
+        bs = x.shape[0]
+        x = self.pool(F.relu(self.bn2d1(self.conv1(x))))
+        x = self.pool(F.relu(self.bn2d2(self.conv2(x))))
+        x = self.pool(F.relu(self.bn2d3(self.conv3(x))))
+        x = self.pool(F.relu(self.bn2d4(self.conv4(x))))
+
+        x = x.view(bs, -1)
+        x = F.relu(F.dropout(self.bn1d1(self.fc1(x)), training=self.training))
+        x = F.relu(F.dropout(self.bn1d2(self.fc2(x)), training=self.training))
+        x = self.fc3(x)
+        return x
+
+class ResNet(nn.Module):
+    def __init__(self):
+        super(ResNet, self).__init__()
+        self.conv1 = nn.Conv2d(3, 64, 7, stride=2)
+        self.pool = nn.MaxPool2d(3, 2)
+
+        self.pool2 = nn.MaxPool2d(2, 2)
+        self.resblock1 = ResBlock(64)
+
+        self.conv2 = nn.Conv2d(64, 64, 3, stride=2)
+        self.resblock2 = ResBlock(64)
+
+        self.conv3 = nn.Conv2d(64, 64, 3, stride=2)
+        self.resblock3 = ResBlock(64)
+
+        self.fc1 = nn.Linear(576, 256)
+        self.bn = nn.BatchNorm1d(256)
+        self.fc2 = nn.Linear(256, 10)
+        return
+
+    def forward(self, x):
+        x = self.conv1(x)
+        x = self.pool(x)
+        x = self.resblock1(x)
+        x = self.conv2(x)
+        x = self.pool2(self.resblock2(x))
+        x = self.conv3(x)
+        x = self.pool2(self.resblock3(x))
+        x = x.view(x.shape[0], -1)
+        x = F.relu(F.dropout(self.bn(self.fc1(x)), training=self.training))
+        return self.fc2(x)
+
+class ResBlock(nn.Module):
+    def __init__(self, channel):
+        super(ResBlock, self).__init__()
+        self.conv1 = nn.Conv2d(channel, channel, 3, padding=1)
+        self.conv2 = nn.Conv2d(channel, channel, 3, padding=1)
+        self.bn1 = nn.BatchNorm2d(channel)
+        self.bn2 = nn.BatchNorm2d(channel)
+        return
+
+    def forward(self, x):
+        inter = F.relu(self.bn1(self.conv1(x)))
+        # print(inter.shape)
+        out = self.bn2(self.conv2(inter))
+        # print(out.shape)
+        addition = out + x
+        return F.relu(addition)
 
 
 class Bottleneck(nn.Module):
@@ -123,9 +210,7 @@ class DenseNet(nn.Module):
         nChannels += nDenseBlocks * growthRate
 
         self.bn1 = nn.BatchNorm2d(nChannels)
-        self.fc1 = nn.Linear(882, 256)
-        self.fc2 = nn.Linear(256, 64)
-        self.fc3 = nn.Linear(64, nClasses)
+        self.fc1 = nn.Linear(4704, nClasses)
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
@@ -154,7 +239,6 @@ class DenseNet(nn.Module):
         out = self.trans2(self.dense2(out))
         out = self.dense3(out)
         out = F.avg_pool2d(F.relu(self.bn1(out)), 8)
-        out = F.relu(self.fc1(out.view(bs, -1)))
-        out = F.relu(self.fc2(out))
-        out = F.relu(self.fc3(out))
+        out = self.fc1(out.view(bs, -1))
+
         return out
