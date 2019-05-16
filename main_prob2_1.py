@@ -42,7 +42,7 @@ PRINT_EVERY = 20
 EMBEDDING_DIM = 10
 HIDDEN_DIM = 10
 LR_DECAY_RATE = 1
-CLIP = 2
+CLIP = 1.2
 OPTIMIZER = 'rmsprop'
 
 DEVICE = torch.device("cuda") if (torch.cuda.is_available()

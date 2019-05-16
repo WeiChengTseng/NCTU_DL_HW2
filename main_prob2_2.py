@@ -43,12 +43,13 @@ EMBEDDING_DIM = 10
 HIDDEN_DIM = 10
 LR_DECAY_RATE = 1
 OPTIMIZER = 'sgd_moment'
+CLIP = 100
 
 DEVICE = torch.device("cuda") if (torch.cuda.is_available()
                                   and USE_CUDA) else torch.device("cpu")
 
-NAME = 'lstm_bs{}_hidden{}_embed{}_lrdc{}_{}'.format(BATCH_SIZE, HIDDEN_DIM,
-                                                  EMBEDDING_DIM, LR_DECAY_RATE,
+NAME = 'lstm_bs{}_hidden{}_embed{}_lrdc{}_clip{}_{}'.format(BATCH_SIZE, HIDDEN_DIM,
+                                                  EMBEDDING_DIM, LR_DECAY_RATE, CLIP,
                                                   OPTIMIZER)
 LOG_PATH = 'result/logs/lstm_/' + NAME
 SAVE_PATH = 'result/ckpt/lstm_/' + NAME + '.pth'
@@ -99,6 +100,7 @@ for epoch in range(NUM_EPOCH):
         pred_scores = lstm_model(seq, seq_len)
         loss = loss_fn(pred_scores, labels)
         loss.backward()
+        torch.nn.utils.clip_grad_norm(lstm_model.parameters(), CLIP)
         optimizer.step()
 
         if step % PRINT_EVERY == 0:
