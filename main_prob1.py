@@ -38,7 +38,8 @@ CKPT_FILE = None
 K = 24
 DEPTH = 10
 WEIGHT_DECAY = 1e-7
-NAME = 'DenseNet_depth{}_k{}_bs{}_wd{}_wobc'.format(DEPTH, K, BATCH_SIZE, WEIGHT_DECAY)
+NAME = 'DenseNet_depth{}_k{}_bs{}_wd{}_wobc'.format(DEPTH, K, BATCH_SIZE,
+                                                    WEIGHT_DECAY)
 LOG_PATH = 'result/logs/' + NAME
 SVAE_PATH = 'result/ckpt/{}.pth'.format(NAME)
 DEVICE = torch.device("cuda") if (torch.cuda.is_available()
@@ -87,8 +88,10 @@ model = DenseNet(growthRate=K,
 # model = DenseNetAnimal10(K).to(DEVICE)
 criterion = nn.CrossEntropyLoss()
 # optimizer = optim.Adam(model.parameters(), lr=0.001)
-optimizer = optim.SGD(model.parameters(), lr=1e-1,
-                            momentum=0.9, weight_decay=WEIGHT_DECAY)
+optimizer = optim.SGD(model.parameters(),
+                      lr=1e-1,
+                      momentum=0.9,
+                      weight_decay=WEIGHT_DECAY)
 step = 0
 print(NAME)
 if CKPT_FILE:
