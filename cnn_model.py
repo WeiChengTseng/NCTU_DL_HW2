@@ -13,10 +13,11 @@ import math
 class CNN(nn.Module):
     def __init__(self):
         super(CNN, self).__init__()
-        self.conv1 = nn.Conv2d(3, 6, 5)
-        self.conv2 = nn.Conv2d(6, 16, 5)
-        self.conv3 = nn.Conv2d(16, 16, 5)
+        self.conv1 = nn.Conv2d(3, 64, 5)
+        self.conv2 = nn.Conv2d(64, 64, 5)
+        self.conv3 = nn.Conv2d(64, 64, 5)
         self.pool = nn.MaxPool2d(2, 2)
+        self.bn1d1 = nn.BatchNorm2d()
         self.fc1 = nn.Linear(16 * 24 * 24, 120)
         self.fc2 = nn.Linear(120, 84)
         self.fc3 = nn.Linear(84, 10)
