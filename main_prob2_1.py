@@ -48,7 +48,7 @@ OPTIMIZER = 'rmsprop'
 DEVICE = torch.device("cuda") if (torch.cuda.is_available()
                                   and USE_CUDA) else torch.device("cpu")
 
-NAME = 'rnn_bs{}_hidden{}_embed{}_lrdc{}_clip{}_{}'.format(
+NAME = 'rnn_bs{}_hidden{}_embed{}_lrdc{}_clip{}_{}_wp'.format(
     BATCH_SIZE, HIDDEN_DIM, EMBEDDING_DIM, LR_DECAY_RATE, CLIP, OPTIMIZER)
 LOG_PATH = 'result/logs/rnn_/' + NAME
 SAVE_PATH = 'result/ckpt/rnn_/' + NAME + '.pth'
