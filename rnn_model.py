@@ -57,10 +57,12 @@ class RNN(nn.Module):
     def forward(self, src, src_lengths):
 
         src_emb = self._emb(src)
-        packed_src = nn.utils.rnn.pack_padded_sequence(src_emb,
-                                                       src_lengths,
-                                                       batch_first=True)
-        outputs, hidden = self._rnn(packed_src)
+
+        outputs, hidden = self._rnn(src_emb)
+        # packed_src = nn.utils.rnn.pack_padded_sequence(src_emb,
+        #                                                src_lengths,
+        #                                                batch_first=True)
+        # outputs, hidden = self._rnn(packed_src)
         hidden = hidden.permute(1, 0, 2).squeeze()
         pred_scores = self._final_pred(hidden)
         return pred_scores

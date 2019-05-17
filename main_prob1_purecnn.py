@@ -38,10 +38,12 @@ CKPT_FILE = None
 # DEPTH = 22
 WEIGHT_DECAY = 1e-4
 NAME = 'CNN_crop8_wd{}_dropout'.format(WEIGHT_DECAY)
+
 NAME = 'SmallCNN5_crop8_wd{}_dropout'.format(WEIGHT_DECAY)
 # NAME = 'ResNet_crop8_wd{}_dropout'.format(WEIGHT_DECAY)
 LOG_PATH = 'result/logs/'+NAME
 SVAE_PATH = 'result/ckpt/'+NAME+'.pth'
+
 DEVICE = torch.device("cuda") if (torch.cuda.is_available()
                                   and USE_CUDA) else torch.device("cpu")
 print('use device: ', DEVICE)
@@ -144,6 +146,7 @@ for epoch in range(NUM_EPOCH):
                 # 'FC_DROPOUT': FC_DROPOUT,
                 # 'MUL_FC': MUL_FC,
                 'WEIGHT_DECAY': WEIGHT_DECAY
-            }, SVAE_PATH)
+            },
+            SVAE_PATH)
 
 print('Finished Training')
