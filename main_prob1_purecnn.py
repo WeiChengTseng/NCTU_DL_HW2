@@ -26,7 +26,7 @@ def calc_accuracy(pred_scores, Y):
         return train_acc.cpu().numpy()
 
 
-NUM_EPOCH = 200
+NUM_EPOCH = 600
 BATCH_SIZE = 50
 USE_CUDA = True
 PRINT_EVERY = 50
@@ -38,8 +38,8 @@ CKPT_FILE = None
 # DEPTH = 22
 WEIGHT_DECAY = 1e-4
 NAME = 'CNN_crop8_wd{}_dropout'.format(WEIGHT_DECAY)
-NAME = 'SmallCNN_crop8_wd{}_dropout'.format(WEIGHT_DECAY)
-NAME = 'ResNet_crop8_wd{}_dropout'.format(WEIGHT_DECAY)
+NAME = 'SmallCNN5_crop8_wd{}_dropout'.format(WEIGHT_DECAY)
+# NAME = 'ResNet_crop8_wd{}_dropout'.format(WEIGHT_DECAY)
 LOG_PATH = 'result/logs/'+NAME
 SVAE_PATH = 'result/ckpt/'+NAME+'.pth'
 DEVICE = torch.device("cuda") if (torch.cuda.is_available()
@@ -79,9 +79,9 @@ val_dl = torch.utils.data.DataLoader(val_ds,
                                      shuffle=True,
                                      num_workers=4)
 
-# model = SmallCNN().to(DEVICE)
+model = SmallCNN().to(DEVICE)
 # model = CNN().to(DEVICE)
-model = ResNet().to(DEVICE)
+# model = ResNet().to(DEVICE)
 
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=0.001, weight_decay=WEIGHT_DECAY)
