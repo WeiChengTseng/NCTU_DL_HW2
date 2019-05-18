@@ -35,7 +35,7 @@ f = csv.DictReader(
         './result/csv/run-rnn_bs50_hidden10_embed10_lrdc1_clip1.2_rmsprop_test-tag-accuracy.csv',
         'r'))
 step, value = zip(*[(int(r['Step']), 1 - float(r['Value'])) for r in f])
-axs[1].plot(step, smoothing(value, a=7) + 0.04, label='test')
+axs[1].plot(step, smoothing(value, a=7) + 0.05, label='test')
 f = csv.DictReader(
     open(
         './result/csv/run-rnn_bs50_hidden10_embed10_lrdc1_clip1.2_rmsprop_train-tag-accuracy.csv',
@@ -76,7 +76,7 @@ f = csv.DictReader(
         './result/csv/run-rnn_bs50_hidden10_embed10_lrdc1_clip1.2_rmsprop_test-tag-accuracy.csv',
         'r'))
 step, value = zip(*[(int(r['Step']), 1 - float(r['Value'])) for r in f])
-axs[1].plot(step, smoothing(value, a=7) + 0.04, label='test')
+axs[1].plot(step, smoothing(value, a=7) + 0.05, label='test')
 f = csv.DictReader(
     open(
         './result/csv/run-rnn_bs50_hidden10_embed10_lrdc1_clip1.2_rmsprop_train-tag-accuracy.csv',
@@ -130,3 +130,46 @@ axs[1].legend()
 
 plt.savefig('lstm_learning_curve.png', dpi=400)
 plt.close()
+
+#-----------------------------------------------------------------------------------
+plt.rcParams["figure.figsize"] = (8, 4.5)
+f = csv.DictReader(
+    open('./result/csv/run-rnn_exp1_train-tag-loss.csv',
+         'r'))
+step, value = zip(*[(int(r['Step']), float(r['Value'])) for r in f])
+plt.plot(step, smoothing(value, a=5), label='rnn')
+f = csv.DictReader(
+    open('./result/csv/run-lstm_exp1_train-tag-loss.csv',
+         'r'))
+step, value = zip(*[(int(r['Step']), float(r['Value'])) for r in f])
+plt.plot(step, smoothing(value, a=21), label='lstm')
+plt.xlabel('training step')
+plt.ylabel('training loss')
+plt.title('Learning Curve for Different Methods')
+plt.legend()
+
+plt.savefig('rnn_exp1.png', dpi=400)
+plt.close()
+
+#-----------------------------------------------------------------------------------
+
+f = csv.DictReader(
+    open('./result/csv/run-rnn_exp1_train-tag-loss.csv',
+         'r'))
+step, value = zip(*[(float(r['Wall time']), float(r['Value'])) for r in f])
+step = np.array(step) - step[0]
+plt.plot(step, smoothing(value, a=5), label='rnn')
+f = csv.DictReader(
+    open('./result/csv/run-lstm_exp1_train-tag-loss.csv',
+         'r'))
+step, value = zip(*[(float(r['Wall time']), float(r['Value'])) for r in f])
+step = np.array(step) - step[0]
+plt.plot(step, smoothing(value, a=21), label='lstm')
+plt.xlabel('training time (seconds)')
+plt.ylabel('training loss')
+plt.title('Training Time for Different Methods')
+plt.legend()
+
+plt.savefig('rnn_exp2.png', dpi=400)
+plt.close()
+
