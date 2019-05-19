@@ -154,10 +154,11 @@ with torch.no_grad():
         outputs = model(inputs.to(DEVICE))
         output_all.append(outputs)
         label_all.append(labels)
-    output_all = torch.cat(output_all).cpu().numpy()
+    output_all = torch.cat(output_all)
     label_all = torch.cat(label_all).cpu().numpy()
     _, pred_all = torch.max(output_all, 1)
     pred_all = pred_all.cpu().numpy()
+    output_all = output_all.cpu().numpy()
     confusion_mat = confusion_matrix(label_all, pred_all)
     np.set_printoptions(precision=3)
     plot_confusion_matrix(label_all, pred_all, classes=val_ds.classes, normalize=True,
