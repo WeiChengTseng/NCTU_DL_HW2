@@ -34,7 +34,7 @@ CKPT_FILE = None
 WEIGHT_DECAY = 1e-4
 STRIDE = 1
 KERNEL = 3
-DILATION = 1
+DILATION = 0
 
 
 NAME = 'CNN3_exp_kernel{}_stride{}_dilation{}'.format(KERNEL, STRIDE, DILATION)
