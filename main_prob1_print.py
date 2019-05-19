@@ -97,6 +97,6 @@ with torch.no_grad():
     label_all = torch.cat(label_all)
     for i in range(10):
         mask = label_all == i
-        acc = calc_accuracy(output_all[mask], label_all[mask])
+        acc = calc_accuracy(output_all[mask], label_all[mask].cuda())
         print(acc)
         pass
