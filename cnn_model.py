@@ -41,19 +41,22 @@ class CNN(nn.Module):
         return x
 
 class ExpCNN(nn.Module):
-    def __init__(self, kernel, stride):
-        super(CNN, self).__init__()
-        self.conv1 = nn.Conv2d(3, 64, kernel, stride)
-        self.conv2 = nn.Conv2d(64, 64, kernel, stride)
+    def __init__(self, kernel, stride, dilation=1):
+        super(ExpCNN, self).__init__()
+        self.conv1 = nn.Conv2d(3, 64, kernel, stride, dilation=dilation)
+        self.conv2 = nn.Conv2d(64, 64, kernel, stride, dilation=dilation)
 
-        self.pool = nn.MaxPool2d(2, 2)
+        self.pool = nn.MaxPool2d(2, 2, dilation=dilation)
         self.bn2d1 = nn.BatchNorm2d(64)
         self.bn2d2 = nn.BatchNorm2d(64)
-
-        self.fc1 = nn.Linear(64 * 5 * 5, 128)
+        size = (224 -dilation * (kernel-1) -1) // stride + 1
+        size = (size -dilation * (2-1) -1) // 2 + 1
+        size = (size -dilation * (kernel-1) -1) // stride + 1
+        size = (size -dilation * (2-1) -1) // 2 + 1
+        print(size)
+        self.fc1 = nn.Linear(64 * size * size, 128)
         self.fc2 = nn.Linear(128, 10)
-        self.bn1d1 = nn.BatchNorm1d(256)
-
+        self.bn1d1 = nn.BatchNorm1d(128)
         return
 
     def forward(self, x):
