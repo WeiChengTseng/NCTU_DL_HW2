@@ -41,10 +41,10 @@ class CNN(nn.Module):
         return x
 
 class ExpCNN(nn.Module):
-    def __init__(self):
+    def __init__(self, kernel, stride):
         super(CNN, self).__init__()
-        self.conv1 = nn.Conv2d(3, 64, 3)
-        self.conv2 = nn.Conv2d(64, 64, 3)
+        self.conv1 = nn.Conv2d(3, 64, kernel, stride)
+        self.conv2 = nn.Conv2d(64, 64, kernel, stride)
 
         self.pool = nn.MaxPool2d(2, 2)
         self.bn2d1 = nn.BatchNorm2d(64)

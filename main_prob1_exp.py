@@ -26,20 +26,17 @@ def calc_accuracy(pred_scores, Y):
         return train_acc.cpu().numpy()
 
 
-NUM_EPOCH = 600
+NUM_EPOCH = 100
 BATCH_SIZE = 50
 USE_CUDA = True
 PRINT_EVERY = 50
 CKPT_FILE = None
-# FC_BATCHNORM = True
-# FC_DROPOUT = True
-# MUL_FC = False
-# K = 12
-# DEPTH = 22
 WEIGHT_DECAY = 1e-4
-NAME = 'CNN_crop8_wd{}_dropout'.format(WEIGHT_DECAY)
+STRIDE = 1
+KERNEL = 3
 
-NAME = 'SmallCNN5_crop8_wd{}_dropout'.format(WEIGHT_DECAY)
+
+NAME = 'CNN5_exp_kernel{}_stride{}'.format(KERNEL, STRIDE)
 # NAME = 'ResNet_crop8_wd{}_dropout'.format(WEIGHT_DECAY)
 LOG_PATH = 'result/logs/'+NAME
 SVAE_PATH = 'result/ckpt/'+NAME+'.pth'
@@ -82,13 +79,11 @@ val_dl = torch.utils.data.DataLoader(val_ds,
                                      num_workers=4)
 
 model = SmallCNN().to(DEVICE)
-# model = CNN().to(DEVICE)
-# model = ResNet().to(DEVICE)
+
 
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=0.001, weight_decay=WEIGHT_DECAY)
-# optimizer = optim.SGD(model.parameters(), lr=1e-1,
-#                             momentum=0.9, weight_decay=WEIGHT_DECAY)
+
 step = 0
 print(NAME)
 if CKPT_FILE:
@@ -140,11 +135,6 @@ for epoch in range(NUM_EPOCH):
             {
                 'model': model.state_dict(),
                 'optimizer': optimizer.state_dict(),
-                # 'K': K,
-                # 'DEPTH': DEPTH,
-                # 'FC_BATCHNORM': FC_BATCHNORM,
-                # 'FC_DROPOUT': FC_DROPOUT,
-                # 'MUL_FC': MUL_FC,
                 'WEIGHT_DECAY': WEIGHT_DECAY
             },
             SVAE_PATH)
