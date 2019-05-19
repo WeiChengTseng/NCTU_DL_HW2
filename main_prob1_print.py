@@ -73,10 +73,15 @@ except:
     print('Support CPU only')
 
 def calc_accuracy(pred_scores, Y):
-    with torch.no_grad():
-        _, pred = torch.max(pred_scores, 1)
-        train_acc = (pred == Y).float().mean()
-        return train_acc.cpu().numpy()
+    try:
+        with torch.no_grad():
+            _, pred = torch.max(pred_scores, 1)
+            train_acc = (pred == Y).float().mean()
+            return train_acc.cpu().numpy()
+    except:
+            pred = np.argmax(pred_scores, 1)
+            train_acc = (pred == Y).mean()
+            return train_acc
 
 NUM_EPOCH = 600
 BATCH_SIZE = 20

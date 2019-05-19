@@ -147,37 +147,37 @@ fig, axs = plt.subplots(1, 2, constrained_layout=False, figsize=(13, 4))
 
 f = csv.DictReader(
     open(
-        './result/csv/run-rnn_bs50_hidden10_embed10_lrdc1_clip1.2_rmsprop_test-tag-loss.csv',
+        './result/csv/run-SmallCNN5_crop8_wd0.0001_dropout_test-tag-loss.csv',
         'r'))
 step, value = zip(*[(int(r['Step']), float(r['Value'])) for r in f])
 axs[0].plot(step, (value), label='test')
 f = csv.DictReader(
     open(
-        './result/csv/run-rnn_bs50_hidden10_embed10_lrdc1_clip1.2_rmsprop_train-tag-loss.csv',
+        './result/csv/run-SmallCNN5_crop8_wd0.0001_dropout_train-tag-loss.csv',
         'r'))
 step, value = zip(*[(int(r['Step']), float(r['Value'])) for r in f])
 axs[0].plot(step, (value), label='train')
 axs[0].set_xlabel('training step')
 axs[0].set_ylabel('loss')
-axs[0].set_title('RNN Learning Curve')
+axs[0].set_title('CNN Learning Curve')
 axs[0].legend()
 
 f = csv.DictReader(
     open(
-        './result/csv/run-rnn_bs50_hidden10_embed10_lrdc1_clip1.2_rmsprop_test-tag-accuracy.csv',
+        './result/csv/run-SmallCNN5_crop8_wd0.0001_dropout_test-tag-accuracy.csv',
         'r'))
 step, value = zip(*[(int(r['Step']), 1 - float(r['Value'])) for r in f])
 axs[1].plot(step, smoothing(value, a=7) + 0.05, label='test')
 f = csv.DictReader(
     open(
-        './result/csv/run-rnn_bs50_hidden10_embed10_lrdc1_clip1.2_rmsprop_train-tag-accuracy.csv',
+        './result/csv/run-SmallCNN5_crop8_wd0.0001_dropout_train-tag-accuracy.csv',
         'r'))
 step, value = zip(*[(int(r['Step']), 1 - float(r['Value'])) for r in f])
 axs[1].plot(step, smoothing(value, a=7), label='train')
 axs[1].set_xlabel('training step')
 axs[1].set_ylabel('error rate')
-axs[1].set_title('RNN Error Rate Curve')
+axs[1].set_title('CNN Error Rate Curve')
 axs[1].legend()
 
-plt.savefig('rnn_learning_curve.png', dpi=400)
+plt.savefig('cnn_learning_curve.png', dpi=400)
 plt.close()
