@@ -11,7 +11,7 @@ import pdb
 import argparse
 import os
 
-from cnn_model import CNN, DenseNet, SmallCNN, ResNet, ExpCNN
+from cnn_model import CNN, DenseNet, SmallCNN, ResNet, ExpCNN, ExpCNN3
 
 try:
     os.environ["CUDA_VISIBLE_DEVICES"] = "2"
@@ -32,12 +32,12 @@ USE_CUDA = True
 PRINT_EVERY = 50
 CKPT_FILE = None
 WEIGHT_DECAY = 1e-4
-STRIDE = 3
+STRIDE = 1
 KERNEL = 3
 DILATION = 1
 
 
-NAME = 'CNN_exp_kernel{}_stride{}_dilation{}'.format(KERNEL, STRIDE, DILATION)
+NAME = 'CNN3_exp_kernel{}_stride{}_dilation{}'.format(KERNEL, STRIDE, DILATION)
 # NAME = 'ResNet_crop8_wd{}_dropout'.format(WEIGHT_DECAY)
 LOG_PATH = 'result/logs/'+NAME
 SVAE_PATH = 'result/ckpt/'+NAME+'.pth'
@@ -79,7 +79,8 @@ val_dl = torch.utils.data.DataLoader(val_ds,
                                      shuffle=True,
                                      num_workers=4)
 
-model = ExpCNN(KERNEL, STRIDE, DILATION).to(DEVICE)
+# model = ExpCNN(KERNEL, STRIDE, DILATION).to(DEVICE)
+model = ExpCNN3(KERNEL, STRIDE, DILATION).to(DEVICE)
 
 
 criterion = nn.CrossEntropyLoss()

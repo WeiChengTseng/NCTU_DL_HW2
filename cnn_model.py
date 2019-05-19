@@ -69,6 +69,40 @@ class ExpCNN(nn.Module):
         x = self.fc2(x)
         return x
 
+class ExpCNN3(nn.Module):
+    def __init__(self, kernel, stride, dilation=1):
+        super(ExpCNN3, self).__init__()
+        self.conv1 = nn.Conv2d(3, 64, kernel, stride, dilation=dilation)
+        self.conv2 = nn.Conv2d(64, 64, kernel, stride, dilation=dilation)
+        self.conv3 = nn.Conv2d(64, 64, kernel, stride, dilation=dilation)
+
+        self.pool = nn.MaxPool2d(2, 2, dilation=dilation)
+        self.bn2d1 = nn.BatchNorm2d(64)
+        self.bn2d2 = nn.BatchNorm2d(64)
+        self.bn2d3 = nn.BatchNorm2d(64)
+        size = (224 -dilation * (kernel-1) -1) // stride + 1
+        size = (size -dilation * (2-1) -1) // 2 + 1
+        size = (size -dilation * (kernel-1) -1) // stride + 1
+        size = (size -dilation * (2-1) -1) // 2 + 1
+        size = (size -dilation * (kernel-1) -1) // stride + 1
+        size = (size -dilation * (2-1) -1) // 2 + 1
+        print(size)
+        self.fc1 = nn.Linear(64 * size * size, 128)
+        self.fc2 = nn.Linear(128, 10)
+        self.bn1d1 = nn.BatchNorm1d(128)
+        return
+
+    def forward(self, x):
+        bs = x.shape[0]
+        x = self.pool(F.relu(self.bn2d1(self.conv1(x))))
+        x = self.pool(F.relu(self.bn2d2(self.conv2(x))))
+        x = self.pool(F.relu(self.bn2d3(self.conv3(x))))
+
+        x = x.view(bs, -1)
+        x = F.relu(F.dropout(self.bn1d1(self.fc1(x)), training=self.training))
+        x = self.fc2(x)
+        return x
+
 
 class SmallCNN(nn.Module):
     def __init__(self):
