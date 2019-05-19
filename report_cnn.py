@@ -109,6 +109,14 @@ step, value = step[:EPOCH], value[:EPOCH]
 plt.plot(step, smoothing(value), label='filter 3x3, 2 CNN layer')
 
 f = csv.DictReader(
+    open('./result/csv/run-CNN3_exp_kernel3_stride1_dilation1_test-tag-accuracy.csv',
+         'r'))
+step, value = zip(*[(float(r['Wall time']), 1-float(r['Value'])) for r in f])
+step = np.array(step) - step[0]
+step, value = step[:EPOCH], value[:EPOCH]
+plt.plot(step, smoothing(value), label='filter 3x3, 3 CNN layer')
+
+f = csv.DictReader(
     open('./result/csv/run-SmallCNN_crop8_wd0.0001_test-tag-accuracy.csv',
          'r'))
 step, value = zip(*[(float(r['Wall time']), 1-float(r['Value'])) for r in f])
@@ -121,7 +129,7 @@ f = csv.DictReader(
          'r'))
 step, value = zip(*[(float(r['Wall time']), 1-float(r['Value'])) for r in f])
 step = np.array(step) - step[0]
-step, value = step[:EPOCH+50], value[:EPOCH+50]
+step, value = step[:EPOCH-80], value[:EPOCH-80]
 plt.plot(step, smoothing(value), label='filter 3x3, 5 CNN layers')
 
 
