@@ -161,7 +161,7 @@ with torch.no_grad():
     _, pred_all = torch.max(output_all, 1)
     pred_all = pred_all.cpu().numpy()
     output_all = output_all.cpu().numpy()
-    pickle.dump((pred_all, output_all), open('cnn_result.pkl', 'wb'))
+    pickle.dump((pred_all, label_all), open('cnn_result.pkl', 'wb'))
     # confusion_mat = confusion_matrix(label_all, pred_all)
     # np.set_printoptions(precision=3)
     # plot_confusion_matrix(label_all, pred_all, classes=val_ds.classes, normalize=True,
@@ -169,6 +169,9 @@ with torch.no_grad():
     # plt.savefig('cm.png', dpi=400)
     for i in range(10):
         mask = label_all == i
-        acc = calc_accuracy(output_all[mask], label_all[mask].cuda())
+        try:
+            acc = calc_accuracy(output_all[mask], label_all[mask].cuda())
+        except:
+            acc = calc_accuracy(output_all[mask], label_all[mask])
         print(acc)
         pass
