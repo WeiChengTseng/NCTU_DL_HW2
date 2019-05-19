@@ -46,12 +46,18 @@ data_transform_test = torchvision.transforms.Compose([
                                      std=[0.229, 0.224, 0.225])
 ])
 
-val_ds = torchvision.datasets.ImageFolder(root='./print/',
+val_ds = torchvision.datasets.ImageFolder(root='./animal-10/val/',
+                                          transform=data_transform_test)
+print_ds = torchvision.datasets.ImageFolder(root='./print/',
                                           transform=data_transform_test)
 ori_ds = torchvision.datasets.ImageFolder(root='./print/',
                                           transform=trans_ori)
 
 val_dl = torch.utils.data.DataLoader(val_ds,
+                                     batch_size=BATCH_SIZE,
+                                     shuffle=False,
+                                     num_workers=4)
+print_dl = torch.utils.data.DataLoader(print_ds,
                                      batch_size=BATCH_SIZE,
                                      shuffle=False,
                                      num_workers=4)
@@ -64,18 +70,33 @@ model = SmallCNN().to(DEVICE)
 
 if CKPT_FILE:
     print('Load checkpoint!!')
-    checkpoint = torch.load(CKPT_FILE, map_location='cpu')
+    checkpoint = torch.load(CKPT_FILE, map_location=DEVICE)
     model.load_state_dict(checkpoint['model'])
 
 model.eval()
 with torch.no_grad():
     test_loss, acc_test = [], []
 
-    n_epoch_test = len(val_ds) // BATCH_SIZE
-    for j, data_t in enumerate(val_dl):
+    n_epoch_test = len(print_ds) // BATCH_SIZE
+    for j, data_t in enumerate(print_dl):
 
         inputs_t, labels_t = data_t
         outputs_t = model(inputs_t.to(DEVICE))
         _, pred = torch.max(outputs_t, 1)
         print(pred)
         print(labels_t)
+
+output_all, label_all = [], []
+with torch.no_grad():
+    for data in val_dl:
+        inputs, labels = data
+        outputs = model(inputs.to(DEVICE))
+        output_all.append(outputs)
+        label_all.append(labels)
+    output_all = torch.cat(output_all)
+    label_all = torch.cat(label_all)
+    for i in range(10):
+        mask = label_all == i
+        acc = calc_accuracy(output_all[mask], label_all[mask])
+        print(acc)
+        pass
