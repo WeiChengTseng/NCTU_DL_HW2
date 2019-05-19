@@ -14,7 +14,7 @@ import os
 from cnn_model import CNN, DenseNet, SmallCNN, ResNet, ExpCNN, ExpCNN3
 
 try:
-    os.environ["CUDA_VISIBLE_DEVICES"] = "2"
+    os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 except:
     print('Support CPU only')
 
@@ -79,8 +79,8 @@ val_dl = torch.utils.data.DataLoader(val_ds,
                                      shuffle=True,
                                      num_workers=4)
 
-# model = ExpCNN(KERNEL, STRIDE, DILATION).to(DEVICE)
-model = ExpCNN3(KERNEL, STRIDE, DILATION).to(DEVICE)
+model = ExpCNN(KERNEL, STRIDE, DILATION).to(DEVICE)
+# model = ExpCNN3(KERNEL, STRIDE, DILATION).to(DEVICE)
 
 
 criterion = nn.CrossEntropyLoss()
