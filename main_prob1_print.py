@@ -10,6 +10,7 @@ from tensorboardX import SummaryWriter
 import pdb
 import argparse
 import os
+import pickle
 
 from cnn_model import CNN, DenseNet, SmallCNN, ResNet
 from sklearn.metrics import confusion_matrix
@@ -160,11 +161,12 @@ with torch.no_grad():
     _, pred_all = torch.max(output_all, 1)
     pred_all = pred_all.cpu().numpy()
     output_all = output_all.cpu().numpy()
-    confusion_mat = confusion_matrix(label_all, pred_all)
-    np.set_printoptions(precision=3)
-    plot_confusion_matrix(label_all, pred_all, classes=val_ds.classes, normalize=True,
-                      title='Confusion Matrix')
-    plt.savefig('cm.png', dpi=400)
+    pickle.dump((pred_all, output_all), open('cnn_result.pkl', 'wb'))
+    # confusion_mat = confusion_matrix(label_all, pred_all)
+    # np.set_printoptions(precision=3)
+    # plot_confusion_matrix(label_all, pred_all, classes=val_ds.classes, normalize=True,
+    #                   title='Confusion Matrix')
+    # plt.savefig('cm.png', dpi=400)
     for i in range(10):
         mask = label_all == i
         acc = calc_accuracy(output_all[mask], label_all[mask].cuda())
