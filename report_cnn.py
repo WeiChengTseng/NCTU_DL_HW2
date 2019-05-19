@@ -156,7 +156,7 @@ f = csv.DictReader(
         './result/csv/run-SmallCNN5_crop8_wd0.0001_dropout_train-tag-loss.csv',
         'r'))
 step, value = zip(*[(int(r['Step']), float(r['Value'])) for r in f])
-axs[0].plot(step, (value), label='train')
+axs[0].plot(step, smoothing(value, a=5), label='train')
 axs[0].set_xlabel('training step')
 axs[0].set_ylabel('loss')
 axs[0].set_title('CNN Learning Curve')
@@ -167,13 +167,13 @@ f = csv.DictReader(
         './result/csv/run-SmallCNN5_crop8_wd0.0001_dropout_test-tag-accuracy.csv',
         'r'))
 step, value = zip(*[(int(r['Step']), 1 - float(r['Value'])) for r in f])
-axs[1].plot(step, smoothing(value, a=3), label='test')
+axs[1].plot(step, (value), label='test')
 f = csv.DictReader(
     open(
         './result/csv/run-SmallCNN5_crop8_wd0.0001_dropout_train-tag-accuracy.csv',
         'r'))
 step, value = zip(*[(int(r['Step']), 1 - float(r['Value'])) for r in f])
-axs[1].plot(step, smoothing(value, a=11), label='train')
+axs[1].plot(step, smoothing(value, a=5), label='train')
 axs[1].set_xlabel('training step')
 axs[1].set_ylabel('error rate')
 axs[1].set_title('CNN Error Rate Curve')
