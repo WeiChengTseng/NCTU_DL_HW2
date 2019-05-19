@@ -20,7 +20,7 @@ f = csv.DictReader(
 step, value = zip(*[(float(r['Wall time']), 1-float(r['Value'])) for r in f])
 step = np.array(step) - step[0]
 step, value = step[:EPOCH], value[:EPOCH]
-plt.plot(step, smoothing(value), label='filter size 3')
+plt.plot(step, smoothing(value), label='filter 3x3, 2 CNN layers')
 
 f = csv.DictReader(
     open('./result/csv/run-CNN_exp_kernel5_stride1_test-tag-accuracy.csv',
@@ -28,7 +28,7 @@ f = csv.DictReader(
 step, value = zip(*[(float(r['Wall time']), 1-float(r['Value'])) for r in f])
 step = np.array(step) - step[0]
 step, value = step[:EPOCH], value[:EPOCH]
-plt.plot(step, smoothing(value), label='filter size 5')
+plt.plot(step, smoothing(value), label='filter 5x5, 2 CNN layers')
 
 f = csv.DictReader(
     open('./result/csv/run-CNN_exp_kernel7_stride1_test-tag-accuracy.csv',
@@ -36,15 +36,15 @@ f = csv.DictReader(
 step, value = zip(*[(float(r['Wall time']), 1-float(r['Value'])) for r in f])
 step = np.array(step) - step[0]
 step, value = step[:EPOCH], value[:EPOCH]
-plt.plot(step, smoothing(value), label='filter size 7')
+plt.plot(step, smoothing(value), label='filter 7x7, 2 CNN layers')
 
 f = csv.DictReader(
     open('./result/csv/run-SmallCNN_crop8_wd0.0001_test-tag-accuracy.csv',
          'r'))
 step, value = zip(*[(float(r['Wall time']), 1-float(r['Value'])) for r in f])
 step = np.array(step) - step[0]
-step, value = step[:EPOCH], value[:EPOCH]
-plt.plot(step, smoothing(value), label='filter size 3, 4 CNN')
+step, value = step[:EPOCH+50], value[:EPOCH+50]
+plt.plot(step, smoothing(value), label='filter 3x3, 4 CNN layers')
 
 plt.yscale('log')
 plt.xlabel('training time (seconds)')
@@ -64,7 +64,7 @@ f = csv.DictReader(
 step, value = zip(*[(float(r['Wall time']), 1-float(r['Value'])) for r in f])
 step = np.array(step) - step[0]
 step, value = step[:EPOCH], value[:EPOCH]
-plt.plot(step, smoothing(value), label='stride 1')
+plt.plot(step, smoothing(value), label='filter 3x3, stride 1')
 
 f = csv.DictReader(
     open('./result/csv/run-CNN_exp_kernel3_stride2_test-tag-accuracy.csv',
@@ -72,7 +72,7 @@ f = csv.DictReader(
 step, value = zip(*[(float(r['Wall time']), 1-float(r['Value'])) for r in f])
 step = np.array(step) - step[0]
 step, value = step[:EPOCH], value[:EPOCH]
-plt.plot(step, smoothing(value), label='stride 2')
+plt.plot(step, smoothing(value), label='filter 3x3, stride 2')
 
 f = csv.DictReader(
     open('./result/csv/run-CNN_exp_kernel3_stride3_test-tag-accuracy.csv',
@@ -80,7 +80,7 @@ f = csv.DictReader(
 step, value = zip(*[(float(r['Wall time']), 1-float(r['Value'])) for r in f])
 step = np.array(step) - step[0]
 step, value = step[:EPOCH], value[:EPOCH]
-plt.plot(step, smoothing(value), label='stride 3')
+plt.plot(step, smoothing(value), label='filter 3x3, stride 3')
 
 # plt.yscale('log')
 plt.xlabel('training time (seconds)')
