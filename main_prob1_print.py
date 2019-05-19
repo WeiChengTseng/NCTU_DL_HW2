@@ -152,7 +152,7 @@ with torch.no_grad():
     output_all = torch.cat(output_all)
     label_all = torch.cat(label_all)
     _, pred_all = torch.max(output_all, 1)
-    confusion_mat = confusion_matrix(label_all.cpu.numpy(), pred_all.cpu().numpy())
+    confusion_mat = confusion_matrix(label_all.cpu().numpy(), pred_all.cpu().numpy())
     np.set_printoptions(precision=3)
     plot_confusion_matrix(label_all, pred_all, classes=val_ds.classes, normalize=True,
                       title='Confusion Matrix')
